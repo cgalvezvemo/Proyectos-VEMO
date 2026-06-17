@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FPD & Migration Matrix — LTO Promecap</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1923;
+    --card: #1a2533;
+    --border: #2a3a4a;
+    --teal: #11ABAB;
+    --orange: #f59e0b;
+    --red: #e05c4b;
+    --text: #e0e0e0;
+    --sub: #8899aa;
+    --green: #22c55e;
+    --purple: #9b59b6;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 0 0 48px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #0d1e2e 0%, #162032 50%, #0f2235 100%);
+    border-bottom: 2px solid var(--teal);
+    padding: 28px 40px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .header-left { display: flex; flex-direction: column; gap: 6px; }
+  .header-logo {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: var(--teal);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px; color: #0f1923;
+    letter-spacing: -1px;
+    flex-shrink: 0;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+  .header-subtitle {
+    font-size: 13px;
+    color: var(--sub);
+    letter-spacing: 0.2px;
+  }
+  .badge-beta {
+    background: rgba(17,171,171,0.15);
+    border: 1px solid rgba(17,171,171,0.4);
+    color: var(--teal);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+  .header-right {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .header-date {
+    font-size: 13px;
+    color: var(--sub);
+  }
+  .header-date strong {
+    color: var(--teal);
+    font-size: 15px;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main { padding: 28px 40px; display: flex; flex-direction: column; gap: 28px; }
+
+  /* ── SECTION TITLES ── */
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--sub);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-title span.accent { color: var(--teal); }
+
+  /* ── HERO KPI GRID ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 20px 18px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .kpi-card.danger::before { background: var(--red); }
+  .kpi-card.warning::before { background: var(--orange); }
+  .kpi-card.good::before { background: var(--green); }
+  .kpi-card.neutral::before { background: var(--teal); }
+
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--sub);
+    margin-bottom: 12px;
+  }
+  .kpi-number {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -1.5px;
+    margin-bottom: 10px;
+  }
+  .kpi-card.danger .kpi-number { color: var(--red); }
+  .kpi-card.warning .kpi-number { color: var(--orange); }
+  .kpi-card.good .kpi-number { color: var(--green); }
+  .kpi-card.neutral .kpi-number { color: var(--teal); }
+
+  .kpi-sublabel {
+    font-size: 11.5px;
+    color: var(--sub);
+    margin-bottom: 14px;
+    line-height: 1.4;
+  }
+  .kpi-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .kpi-delta.bad { background: rgba(224,92,75,0.15); color: var(--red); }
+  .kpi-delta.warn { background: rgba(245,158,11,0.15); color: var(--orange); }
+  .kpi-delta.ok { background: rgba(34,197,94,0.15); color: var(--green); }
+
+  .kpi-benchmark {
+    font-size: 10.5px;
+    color: var(--sub);
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+    margin-top: 4px;
+    opacity: 0.85;
+  }
+  .kpi-benchmark strong { color: #c8d8e0; }
+
+  /* ── HEATMAP ── */
+  .heatmap-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .heatmap-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .heatmap-subtitle {
+    font-size: 12px;
+    color: var(--sub);
+    margin-bottom: 20px;
+  }
+  .heatmap-wrapper {
+    overflow-x: auto;
+  }
+  .heatmap-table {
+    border-collapse: separate;
+    border-spacing: 4px;
+    min-width: 680px;
+    width: 100%;
+  }
+  .heatmap-table th {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 8px 6px;
+    text-align: center;
+    color: var(--sub);
+  }
+  .heatmap-table th.was-header {
+    text-align: right;
+    padding-right: 14px;
+    color: var(--sub);
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .heatmap-table th.is-header {
+    color: var(--text);
+    font-weight: 700;
+    font-size: 11.5px;
+    padding: 6px 10px;
+  }
+  .heatmap-table td {
+    border-radius: 6px;
+    text-align: center;
+    padding: 10px 8px;
+    min-width: 90px;
+    font-size: 12px;
+    line-height: 1.4;
+    transition: filter 0.15s;
+    position: relative;
+  }
+  .heatmap-table td:hover { filter: brightness(1.2); }
+  .heatmap-table td.row-label {
+    text-align: right;
+    padding-right: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    background: transparent !important;
+    min-width: 80px;
+    white-space: nowrap;
+  }
+  .heatmap-table td.row-total {
+    text-align: right;
+    padding-right: 8px;
+    font-size: 11px;
+    color: var(--sub);
+    background: transparent !important;
+    min-width: 70px;
+    white-space: nowrap;
+  }
+  .cell-pct {
+    font-weight: 700;
+    font-size: 13px;
+    display: block;
+  }
+  .cell-n {
+    font-size: 10px;
+    opacity: 0.75;
+    display: block;
+    margin-top: 1px;
+  }
+  .cell-empty {
+    font-size: 16px;
+    color: rgba(136,153,170,0.3);
+  }
+  .heatmap-footer {
+    font-size: 11px;
+    color: var(--sub);
+    margin-top: 12px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .legend-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+
+  /* ── CHART CARDS ── */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .chart-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .chart-subtitle {
+    font-size: 12px;
+    color: var(--sub);
+    margin-bottom: 16px;
+  }
+  .chart-note {
+    font-size: 10.5px;
+    color: var(--sub);
+    margin-top: 10px;
+    font-style: italic;
+    opacity: 0.8;
+  }
+  canvas { display: block; }
+
+  /* ── FPD TABLE ── */
+  .table-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    overflow-x: auto;
+  }
+  .table-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .table-subtitle {
+    font-size: 12px;
+    color: var(--sub);
+    margin-bottom: 18px;
+  }
+  .fpd-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .fpd-table thead tr {
+    border-bottom: 2px solid var(--border);
+  }
+  .fpd-table th {
+    padding: 10px 14px;
+    text-align: right;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--sub);
+    white-space: nowrap;
+  }
+  .fpd-table th:first-child { text-align: left; }
+  .fpd-table td {
+    padding: 9px 14px;
+    text-align: right;
+    border-bottom: 1px solid rgba(42,58,74,0.5);
+    white-space: nowrap;
+  }
+  .fpd-table td:first-child { text-align: left; font-weight: 600; }
+  .fpd-table tbody tr:hover { background: rgba(255,255,255,0.025); }
+  .fpd-table tbody tr.row-green td { background: rgba(34,197,94,0.04); }
+  .fpd-table tbody tr.row-yellow td { background: rgba(245,158,11,0.06); }
+  .fpd-table tbody tr.row-red td { background: rgba(224,92,75,0.08); }
+  .fpd-table .semaforo { font-size: 16px; }
+  .pct-value { font-variant-numeric: tabular-nums; }
+  .pct-red { color: var(--red); font-weight: 700; }
+  .pct-yellow { color: var(--orange); font-weight: 700; }
+  .pct-green { color: var(--green); }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin: 0 40px;
+    border-top: 1px solid var(--border);
+    padding-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .footer p {
+    font-size: 11px;
+    color: var(--sub);
+    line-height: 1.6;
+  }
+  .footer p strong { color: #aabbcc; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 700px) {
+    .header { padding: 20px; }
+    .main { padding: 16px; }
+    .kpi-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header class="header">
+  <div class="header-left">
+    <div class="header-logo">
+      <div class="logo-mark">VM</div>
+      <div>
+        <h1>First Payment Default &amp; Migration Matrix</h1>
+        <div class="header-subtitle">Cartera LTO — Promecap &nbsp;·&nbsp; Corte: 7-jun-26</div>
+      </div>
+    </div>
+    <span class="badge-beta">BETA</span>
+  </div>
+  <div class="header-right">
+    <div class="header-date">Generado: <strong>7 jun 2026</strong></div>
+    <div style="font-size:11px;color:var(--sub);margin-top:4px;">Actualización semanal · Promecap FILTRADO</div>
+  </div>
+</header>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- ── SECTION 1: HERO KPIs ── -->
+  <div>
+    <div class="section-title"><span class="accent">01</span> Indicadores Clave de Migración</div>
+    <div class="kpi-grid">
+
+      <!-- Roll Rate -->
+      <div class="kpi-card danger">
+        <div class="kpi-label">Roll Rate</div>
+        <div class="kpi-number">30.5%</div>
+        <div class="kpi-sublabel">Corriente → Mora (sem a sem)</div>
+        <div class="kpi-delta bad">▲ vs ago'25: +21.5pp</div>
+        <div class="kpi-benchmark"><strong>Benchmark industria:</strong> &lt;10%</div>
+      </div>
+
+      <!-- Cure Rate -->
+      <div class="kpi-card danger">
+        <div class="kpi-label">Cure Rate</div>
+        <div class="kpi-number">8.6%</div>
+        <div class="kpi-sublabel">1-14d → Corriente</div>
+        <div class="kpi-delta bad">▼ vs ago'25: −3.3pp</div>
+        <div class="kpi-benchmark"><strong>Benchmark industria:</strong> &gt;40%</div>
+      </div>
+
+      <!-- FPD Global -->
+      <div class="kpi-card warning">
+        <div class="kpi-label">FPD Global</div>
+        <div class="kpi-number">1.9%</div>
+        <div class="kpi-sublabel">FPD cosecha mar-abr'26</div>
+        <div class="kpi-delta warn">▲ Tendencia ↑</div>
+        <div class="kpi-benchmark"><strong>Prime auto LATAM:</strong> &lt;2%</div>
+      </div>
+
+      <!-- FPD AF May'26 -->
+      <div class="kpi-card danger">
+        <div class="kpi-label">FPD AF</div>
+        <div class="kpi-number">7.0%</div>
+        <div class="kpi-sublabel">FPD cosecha may'26</div>
+        <div class="kpi-delta bad">⚠ Cosecha más reciente</div>
+        <div class="kpi-benchmark"><strong>Near-prime:</strong> 3–8%</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── SECTION 2: HEATMAP ── -->
+  <div>
+    <div class="section-title"><span class="accent">02</span> Matriz de Migración WAS / IS</div>
+    <div class="heatmap-card">
+      <div class="heatmap-title">Matriz de Migración WAS/IS &nbsp;·&nbsp; May-24 → Jun-07</div>
+      <div class="heatmap-subtitle">Filas = Estado anterior (T-1) &nbsp;·&nbsp; Columnas = Estado actual (T)</div>
+      <div class="heatmap-wrapper">
+        <table class="heatmap-table" id="heatmapTable">
+          <!-- built by JS -->
+        </table>
+      </div>
+      <div class="heatmap-footer">
+        <span><span class="legend-dot" style="background:rgba(34,197,94,0.6)"></span>Verde = curación (mejora de bucket)</span>
+        <span><span class="legend-dot" style="background:rgba(224,92,75,0.6)"></span>Rojo = rodamiento (deterioro de bucket)</span>
+        <span><span class="legend-dot" style="background:rgba(180,190,200,0.4)"></span>Diagonal = sin cambio de estado</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 3 & 4: CHARTS ── -->
+  <div class="charts-row">
+
+    <!-- Roll & Cure Trend -->
+    <div class="chart-card">
+      <div class="chart-title">Evolución de Tasas de Migración</div>
+      <div class="chart-subtitle">Roll Rate corriente → mora · Cure Rate 1-14d → corriente</div>
+      <canvas id="trendChart" height="220"></canvas>
+      <div class="chart-note">* Saltos en nov'25 y abr'26 corresponden a gaps en datos semanales disponibles</div>
+    </div>
+
+    <!-- FPD por Cosecha -->
+    <div class="chart-card">
+      <div class="chart-title">First Payment Default por Cosecha</div>
+      <div class="chart-subtitle">Snapshot al 7-jun-26 · Contratos con FPP vencida ≥14 días</div>
+      <canvas id="fpdChart" height="220"></canvas>
+    </div>
+
+  </div>
+
+  <!-- ── SECTION 5: FPD TABLE ── -->
+  <div>
+    <div class="section-title"><span class="accent">05</span> Detalle FPD por Cosecha de Originación</div>
+    <div class="table-card">
+      <div class="table-title">Resumen FPD por Cosecha</div>
+      <div class="table-subtitle">Corte al 7-jun-26 · FPD = último pago &lt; FPP</div>
+      <table class="fpd-table">
+        <thead>
+          <tr>
+            <th>Cosecha</th>
+            <th>N Contratos</th>
+            <th>FPD (n)</th>
+            <th>FPD %</th>
+            <th>AF %</th>
+            <th>CSC %</th>
+            <th>AFV %</th>
+            <th>Semáforo</th>
+          </tr>
+        </thead>
+        <tbody id="fpdTableBody">
+          <!-- built by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <p><strong>Benchmarks:</strong> Prime auto LATAM &lt;2% &nbsp;|&nbsp; Near-prime 3–8% &nbsp;|&nbsp; Roll Rate industria &lt;10% &nbsp;|&nbsp; Cure Rate industria &gt;40%</p>
+  <p><strong>Fuente:</strong> FILTRADO semanal Promecap · Gap FPP mediana 14 días</p>
+  <p>*May'26: muestra parcial — FPP+14d vencida al 7-jun. FPD medido como ult_pago &lt; FPP.</p>
+</footer>
+
+<script>
+// ══════════════════════════════════════════════
+//  1. HEATMAP
+// ══════════════════════════════════════════════
+(function buildHeatmap() {
+  const labels = ['Corriente', '1-14d', '15-29d', '30-60d', '61-90d', '+91d'];
+  const totals = [1881, 776, 326, 347, 128, 137];
+
+  // [pct, n] for each cell
+  const data = [
+    [[69.5,1305],[29.2,549],[1.2,23],[0,0],[0,0],[0,0]],
+    [[8.6,67],[65.5,508],[23.2,180],[2.7,21],[0,0],[0,0]],
+    [[6.4,21],[10.4,34],[42.6,139],[40.5,132],[0,0],[0,0]],
+    [[4.3,15],[2.9,10],[2.9,10],[58.5,203],[31.4,109],[0,0]],
+    [[1.6,2],[0,0],[0,0],[0,0],[40.6,52],[57.8,74]],
+    [[0.7,1],[0,0],[0,0],[0,0],[0,0],[99.3,136]]
+  ];
+
+  function cellStyle(row, col, pct) {
+    if (pct === 0) return `background:rgba(15,25,35,0.6);`;
+    const v = Math.min(pct / 100, 1);
+    if (row === col) {
+      // diagonal — gray
+      const l = Math.round(20 + v * 45);
+      return `background:rgba(${150+Math.round(v*80)},${160+Math.round(v*70)},${170+Math.round(v*60)},${0.15+v*0.55});`;
+    } else if (col < row) {
+      // below diagonal → rolling (red)
+      const a = 0.12 + v * 0.65;
+      return `background:rgba(224,92,75,${a.toFixed(2)});`;
+    } else {
+      // above diagonal → curing (green)
+      const a = 0.12 + v * 0.6;
+      return `background:rgba(34,197,94,${a.toFixed(2)});`;
+    }
+  }
+
+  function textColor(row, col, pct) {
+    if (pct === 0) return 'color:rgba(136,153,170,0.25);';
+    if (row === col) return pct > 50 ? 'color:#fff;' : 'color:#e0e0e0;';
+    return 'color:#fff;';
+  }
+
+  const table = document.getElementById('heatmapTable');
+
+  // Header row
+  const thead = document.createElement('thead');
+  let hrow = '<tr>';
+  hrow += '<th class="was-header">WAS \\ IS</th>';
+  labels.forEach(l => { hrow += `<th class="is-header">${l}</th>`; });
+  hrow += '<th style="color:var(--sub);font-size:11px;padding-left:10px;">Total</th></tr>';
+  thead.innerHTML = hrow;
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  data.forEach((row, ri) => {
+    let tr = '<tr>';
+    tr += `<td class="row-label">${labels[ri]}</td>`;
+    row.forEach(([pct, n], ci) => {
+      const style = cellStyle(ri, ci, pct) + textColor(ri, ci, pct);
+      if (pct === 0) {
+        tr += `<td style="${style}"><span class="cell-empty">—</span></td>`;
+      } else {
+        tr += `<td style="${style}"><span class="cell-pct">${pct.toFixed(1)}%</span><span class="cell-n">(${n.toLocaleString()})</span></td>`;
+      }
+    });
+    tr += `<td class="row-total">n=${totals[ri].toLocaleString()}</td>`;
+    tr += '</tr>';
+    tbody.innerHTML += tr;
+  });
+  table.appendChild(tbody);
+})();
+
+
+// ══════════════════════════════════════════════
+//  2. TREND CHART
+// ══════════════════════════════════════════════
+(function buildTrendChart() {
+  const labels = ["12-Ago'25","19-Ago","26-Ago","9-Sep","17-Sep","23-Sep","29-Sep","4-Nov","16-Abr'26","20-Abr","28-Abr","24-May","7-Jun"];
+  const rollData = [8.6,5.6,4.4,9.0,5.2,8.2,5.7,14.0,40.2,8.9,7.9,17.6,30.5];
+  const cureData = [11.9,9.9,11.6,15.0,22.6,9.8,25.2,16.6,17.9,10.3,9.9,8.6,8.6];
+
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Roll Rate corriente',
+          data: rollData,
+          borderColor: '#e05c4b',
+          backgroundColor: 'rgba(224,92,75,0.08)',
+          borderWidth: 2.5,
+          pointBackgroundColor: '#e05c4b',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.3,
+          fill: false,
+          order: 1
+        },
+        {
+          label: 'Cure Rate 1-14d',
+          data: cureData,
+          borderColor: '#11ABAB',
+          backgroundColor: 'rgba(17,171,171,0.08)',
+          borderWidth: 2.5,
+          pointBackgroundColor: '#11ABAB',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.3,
+          fill: false,
+          order: 2
+        },
+        {
+          label: 'BMK Roll (<10%)',
+          data: new Array(labels.length).fill(10),
+          borderColor: 'rgba(224,92,75,0.35)',
+          borderWidth: 1.5,
+          borderDash: [6,4],
+          pointRadius: 0,
+          fill: false,
+          order: 3
+        },
+        {
+          label: 'BMK Cure (>40%)',
+          data: new Array(labels.length).fill(40),
+          borderColor: 'rgba(17,171,171,0.35)',
+          borderWidth: 1.5,
+          borderDash: [6,4],
+          pointRadius: 0,
+          fill: false,
+          order: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 600 },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: '#8899aa',
+            font: { size: 11, family: 'Segoe UI' },
+            boxWidth: 24,
+            padding: 14,
+            usePointStyle: true,
+            pointStyleWidth: 14
+          }
+        },
+        tooltip: {
+          backgroundColor: '#1a2533',
+          borderColor: '#2a3a4a',
+          borderWidth: 1,
+          titleColor: '#e0e0e0',
+          bodyColor: '#8899aa',
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#8899aa',
+            font: { size: 10 },
+            maxRotation: 45,
+            minRotation: 30
+          },
+          grid: { color: 'rgba(42,58,74,0.6)' }
+        },
+        y: {
+          ticks: {
+            color: '#8899aa',
+            font: { size: 11 },
+            callback: v => v + '%'
+          },
+          grid: { color: 'rgba(42,58,74,0.6)' },
+          title: { display: true, text: '% Cartera', color: '#8899aa', font: { size: 11 } }
+        }
+      }
+    }
+  });
+})();
+
+
+// ══════════════════════════════════════════════
+//  3. FPD COSECHA CHART
+// ══════════════════════════════════════════════
+(function buildFPDChart() {
+  const labels = ["May'25","Jun","Jul","Ago","Sep","Oct","Nov","Dic","Ene'26","Feb","Mar","Abr","May"];
+  const afData  = [0,0,0,0,0,0,0,0.5,0.6,0.8,1.5,2.2,7.0];
+  const cscData = [0,0,0,0,0,0,0,0,0,0,3.8,0,4.5];
+  const afvData = [0,0,0,0,0,0,0,0,0,0,0,0,1.5];
+
+  const ctx = document.getElementById('fpdChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'AF',
+          data: afData,
+          backgroundColor: 'rgba(17,171,171,0.75)',
+          borderColor: '#11ABAB',
+          borderWidth: 1,
+          borderRadius: 3,
+          order: 1
+        },
+        {
+          label: 'CSC',
+          data: cscData,
+          backgroundColor: 'rgba(245,158,11,0.75)',
+          borderColor: '#f59e0b',
+          borderWidth: 1,
+          borderRadius: 3,
+          order: 2
+        },
+        {
+          label: 'AFV',
+          data: afvData,
+          backgroundColor: 'rgba(155,89,182,0.75)',
+          borderColor: '#9b59b6',
+          borderWidth: 1,
+          borderRadius: 3,
+          order: 3
+        },
+        {
+          label: 'BMK Prime (<2%)',
+          data: new Array(labels.length).fill(2),
+          type: 'line',
+          borderColor: 'rgba(245,158,11,0.45)',
+          borderWidth: 1.5,
+          borderDash: [6,4],
+          pointRadius: 0,
+          fill: false,
+          order: 0
+        },
+        {
+          label: 'BMK Near-prime (5%)',
+          data: new Array(labels.length).fill(5),
+          type: 'line',
+          borderColor: 'rgba(224,92,75,0.40)',
+          borderWidth: 1.5,
+          borderDash: [6,4],
+          pointRadius: 0,
+          fill: false,
+          order: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 600 },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: '#8899aa',
+            font: { size: 11, family: 'Segoe UI' },
+            boxWidth: 20,
+            padding: 12,
+            usePointStyle: true,
+            pointStyleWidth: 12
+          }
+        },
+        tooltip: {
+          backgroundColor: '#1a2533',
+          borderColor: '#2a3a4a',
+          borderWidth: 1,
+          titleColor: '#e0e0e0',
+          bodyColor: '#8899aa',
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`
+          }
+        },
+        annotation: {}
+      },
+      scales: {
+        x: {
+          ticks: { color: '#8899aa', font: { size: 11 } },
+          grid: { color: 'rgba(42,58,74,0.5)' }
+        },
+        y: {
+          ticks: {
+            color: '#8899aa',
+            font: { size: 11 },
+            callback: v => v + '%'
+          },
+          grid: { color: 'rgba(42,58,74,0.5)' },
+          title: { display: true, text: '% Contratos FPD', color: '#8899aa', font: { size: 11 } },
+          max: 9
+        }
+      }
+    }
+  });
+
+  // Add annotation for May'26
+  const canvas = document.getElementById('fpdChart');
+  canvas.parentElement.style.position = 'relative';
+  const note = document.createElement('div');
+  note.style.cssText = `
+    position:absolute; bottom:42px; right:12px;
+    background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3);
+    color:#f59e0b; font-size:10px; padding:3px 8px; border-radius:4px;
+    pointer-events:none;
+  `;
+  note.textContent = '⚠ May\'26: muestra parcial (n=131)';
+  canvas.parentElement.appendChild(note);
+})();
+
+
+// ══════════════════════════════════════════════
+//  4. FPD TABLE
+// ══════════════════════════════════════════════
+(function buildFPDTable() {
+  const rows = [
+    ["May'25",   89,  0, 0.0, 0.0, 0.0, 0.0, '🟢', 'green'],
+    ["Jun'25",  120,  0, 0.0, 0.0, 0.0, 0.0, '🟢', 'green'],
+    ["Jul'25",  129,  0, 0.0, 0.0, 0.0, 0.0, '🟢', 'green'],
+    ["Ago'25",   99,  0, 0.0, 0.0, 0.0, 0.0, '🟢', 'green'],
+    ["Sep'25",  137,  0, 0.0, 0.0, 0.0, 0.0, '🟢', 'green'],
+    ["Oct'25",  158,  0, 0.0, 0.0, 0.0, 0.0, '🟢', 'green'],
+    ["Nov'25",  243,  0, 0.0, 0.0, 0.0, 0.0, '🟢', 'green'],
+    ["Dic'25",  229,  1, 0.4, 0.5, 0.0, 0.0, '🟢', 'green'],
+    ["Ene'26",  198,  1, 0.5, 0.6, 0.0, 0.0, '🟢', 'green'],
+    ["Feb'26",  292,  2, 0.7, 0.8, 0.0, 0.0, '🟢', 'green'],
+    ["Mar'26",  314,  6, 1.9, 1.5, 3.8, 0.0, '🟡', 'yellow'],
+    ["Abr'26",  319,  6, 1.9, 2.2, 0.0, 0.0, '🟡', 'yellow'],
+    ["May'26*", 131,  5, 3.8, 7.0, 4.5, 1.5, '🔴', 'red']
+  ];
+
+  function fmtPct(v, row) {
+    if (v === 0) return '<span style="color:var(--sub)">0.0%</span>';
+    const cls = row === 'red' ? 'pct-red' : (row === 'yellow' ? 'pct-yellow' : 'pct-green');
+    return `<span class="pct-value ${cls}">${v.toFixed(1)}%</span>`;
+  }
+
+  const tbody = document.getElementById('fpdTableBody');
+  rows.forEach(([cosecha, n, fpdn, fpdpct, af, csc, afv, sem, rowClass]) => {
+    const tr = document.createElement('tr');
+    tr.className = `row-${rowClass}`;
+    tr.innerHTML = `
+      <td>${cosecha}</td>
+      <td>${n.toLocaleString()}</td>
+      <td>${fpdn}</td>
+      <td>${fmtPct(fpdpct, rowClass)}</td>
+      <td>${fmtPct(af, rowClass)}</td>
+      <td>${fmtPct(csc, rowClass)}</td>
+      <td>${fmtPct(afv, rowClass)}</td>
+      <td class="semaforo">${sem}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+})();
+</script>
+</body>
+</html>
