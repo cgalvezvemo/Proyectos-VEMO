@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análisis de Cartera LTO | Mayo 2025 – Mayo 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --teal:#11ABAB; --forest:#1F5556; --forest-dark:#14393A;
+  --light:#F2F2F2; --white:#FFFFFF;
+  --text:#1a2424; --text2:#4a6060; --text3:#8a9a9a;
+  --red:#c0392b; --red-light:#fdf0ee; --green:#1a7a4a; --green-light:#edf7f1;
+  --orange:#d97706; --amber:#f59e0b;
+  --border:rgba(31,85,86,0.12); --border2:rgba(31,85,86,0.2);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Space Grotesk',sans-serif;background:var(--light);color:var(--text);min-height:100vh;}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:28px;background:var(--teal);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:20px 0;}
+.sidebar-label{font-size:8px;font-weight:700;color:#fff;letter-spacing:.22em;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);}
+.sidebar-dot{width:8px;height:8px;border-radius:50%;background:var(--forest);}
+.sidebar-bottom{font-size:7px;color:rgba(255,255,255,.6);writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.12em;text-transform:uppercase;}
+
+/* ── NAV (top header) ── */
+nav{position:fixed;top:0;left:28px;right:0;z-index:100;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 2rem;height:52px;gap:2rem;overflow-x:auto;}
+.brand{font-size:18px;font-weight:800;color:var(--forest);letter-spacing:.06em;}
+.brand span{color:var(--teal);}
+.nav-divider{width:1px;height:24px;background:var(--border2);}
+.nav-subtitle{font-size:11px;color:var(--text2);font-weight:500;}
+nav a{color:var(--text2);font-size:11px;font-weight:600;text-decoration:none;padding:3px 0;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;letter-spacing:.02em;}
+nav a:hover,nav a.active{color:var(--teal);border-bottom-color:var(--teal);}
+.nav-badge{font-size:10px;color:var(--teal);background:rgba(17,171,171,.08);border:1px solid rgba(17,171,171,.3);border-radius:20px;padding:4px 12px;font-weight:500;margin-left:auto;white-space:nowrap;}
+.nav-conf{font-size:9px;color:var(--text3);border:1px solid var(--text3);border-radius:3px;padding:3px 9px;letter-spacing:.1em;text-transform:uppercase;}
+
+/* ── LAYOUT ── */
+main{margin-top:52px;margin-left:28px;}
+.section{padding:2.5rem 2.5rem 2rem;scroll-margin-top:52px;}
+.section:nth-child(even){background:var(--white);}
+.section:nth-child(odd){background:var(--light);}
+.section.dark{background:var(--forest-dark);color:#fff;}
+
+/* ── HERO ── */
+.hero{background:var(--forest);color:#fff;padding:4rem 2.5rem 3.5rem;margin-left:0;}
+.hero h1{font-size:40px;font-weight:800;line-height:1.1;margin-bottom:.8rem;}
+.hero h1 span{color:var(--teal);}
+.hero .tagline{font-size:14px;color:rgba(255,255,255,.75);margin-bottom:2.5rem;max-width:600px;line-height:1.6;}
+.hero-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:6px;overflow:hidden;}
+.hero-kpi{background:rgba(255,255,255,.04);padding:1rem 1.2rem;}
+.hero-kpi:hover{background:rgba(17,171,171,.1);}
+.hero-kpi .v{font-size:26px;font-weight:800;}
+.hero-kpi .l{font-size:10px;color:rgba(255,255,255,.7);margin-top:.2rem;text-transform:uppercase;letter-spacing:.05em;}
+.hero-kpi .s{font-size:10px;color:#8a9a9a;margin-top:.15rem;}
+
+/* ── SECTION HEADS ── */
+.section-label{background:var(--forest);color:#fff;font-size:12px;font-weight:700;padding:10px 18px;border-radius:5px;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;letter-spacing:.02em;}
+h2{font-size:22px;font-weight:800;color:var(--forest);margin-bottom:.3rem;}
+.section.dark h2{color:#fff;}
+.subtitle{font-size:13px;color:var(--text3);margin-bottom:1.75rem;}
+.section.dark .subtitle{color:rgba(255,255,255,.6);}
+
+/* ── ALERTS ── */
+.alert{border-radius:5px;padding:10px 14px;margin-bottom:1.25rem;border-left:3px solid;font-size:12px;line-height:1.6;}
+.alert.red{background:var(--red-light);border-color:var(--red);color:#7b1d1d;}
+.alert.amber{background:rgba(245,158,11,.08);border-color:var(--amber);color:#78350f;}
+
+/* ── KPI COMPARATIVO ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:rgba(31,85,86,.06);margin-bottom:2rem;}
+.kpi-comp{background:var(--white);padding:14px 18px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;}
+.kpi-comp::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--teal);}
+.kpi-comp .lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem;}
+.kpi-comp .val{font-size:26px;font-weight:800;color:var(--forest);line-height:1.1;}
+.kpi-comp .comps{display:flex;gap:.75rem;margin-top:.5rem;flex-wrap:wrap;}
+.kpi-comp .comp-item{font-size:10px;line-height:1.4;}
+.kpi-comp .comp-lbl{color:var(--text3);}
+.kpi-comp .comp-val{font-weight:700;}
+.comp-up{color:var(--red);}
+.comp-down{color:var(--green);}
+
+/* ── CHART BOXES ── */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.chart-grid.one{grid-template-columns:1fr;}
+.chart-box{background:var(--white);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.chart-box h4{font-size:11px;font-weight:700;color:#fff;background:var(--teal);padding:9px 16px;letter-spacing:.02em;text-transform:uppercase;}
+.chart-box>.chart-wrap,.chart-box>.chart-box-body,.chart-box>table,.chart-box>div:not(.chart-box-body){padding:14px 16px;}
+.chart-box-body{padding:14px 16px;}
+.chart-wrap{position:relative;height:260px;}
+
+/* ── TABLES ── */
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{background:var(--forest);color:#fff;padding:9px 12px;text-align:right;font-size:10px;font-weight:700;letter-spacing:.04em;white-space:nowrap;}
+th:first-child{text-align:left;}
+td{padding:8px 12px;text-align:right;border-bottom:1px solid rgba(31,85,86,.07);color:var(--text);}
+td:first-child{text-align:left;font-weight:600;color:var(--forest);}
+tr:hover td{background:rgba(17,171,171,.04);}
+.badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:700;}
+.badge.red{background:var(--red-light);color:var(--red);}
+.badge.orange{background:rgba(217,119,6,.1);color:var(--orange);}
+.badge.amber{background:rgba(245,158,11,.1);color:#92400e;}
+.badge.green{background:var(--green-light);color:var(--green);}
+
+/* ── HEATMAP ── */
+.hmap{width:100%;border-collapse:collapse;font-size:12px;}
+.hmap th{background:var(--forest);color:#fff;padding:8px 10px;font-size:10px;font-weight:700;white-space:nowrap;text-align:center;letter-spacing:.04em;}
+.hmap th.lbl{text-align:left;background:var(--teal);}
+.hmap td{padding:7px 10px;border:1px solid rgba(31,85,86,.1);text-align:center;font-weight:600;font-size:12px;white-space:nowrap;}
+.hmap td.bucket{background:rgba(17,171,171,.07);color:var(--forest);text-align:left;font-weight:700;}
+.hmap td.h0{background:#DCFCE7;color:#15803D;}
+.hmap td.h1{background:#FEF9C3;color:#854D0E;}
+.hmap td.h2{background:#FFEDD5;color:#C2410C;}
+.hmap td.h3{background:#FFD7D7;color:#991B1B;}
+.hmap td.h4{background:var(--red);color:#fff;}
+
+/* ── MATRIX ── */
+.matrix-wrap{overflow-x:auto;}
+.matrix{border-collapse:collapse;font-size:12px;width:100%;}
+.matrix th{background:var(--forest);color:#fff;padding:8px 12px;white-space:nowrap;font-size:10px;text-align:center;letter-spacing:.03em;}
+.matrix th.was{background:var(--teal);text-align:left;}
+.matrix td{padding:8px 12px;border:1px solid var(--border);text-align:center;white-space:nowrap;}
+.matrix td.label{background:rgba(17,171,171,.07);font-weight:700;color:var(--forest);text-align:left;}
+.matrix td.diag{background:rgba(31,85,86,.1);font-weight:700;}
+.matrix td.roll-hi{background:var(--red);color:#fff;font-weight:700;}
+.matrix td.roll-md{background:#e07020;color:#fff;font-weight:700;}
+.matrix td.roll-lo{background:var(--red-light);color:var(--red);}
+.matrix td.cure{background:var(--green-light);color:var(--green);font-weight:600;}
+.matrix td.empty{background:#fafafa;}
+
+/* ── BUTTONS ── */
+.mat-btn,.bkt-btn,.view-btn{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;background:var(--white);border:1px solid var(--border2);border-radius:5px;padding:6px 14px;cursor:pointer;color:var(--text2);transition:all .12s;}
+.mat-btn:hover,.bkt-btn:hover,.view-btn:hover{border-color:var(--teal);color:var(--teal);}
+.mat-btn.active,.view-btn.active{background:var(--forest);color:#fff;border-color:var(--forest);}
+.bkt-btn.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+
+/* ── RR BARS ── */
+.rr-grid{display:grid;gap:.6rem;}
+.rr-row{display:grid;grid-template-columns:110px 1fr 70px;gap:.75rem;align-items:center;font-size:12px;}
+.rr-label{font-weight:700;color:var(--forest);}
+.rr-bar-wrap{background:rgba(31,85,86,.08);border-radius:4px;height:24px;overflow:hidden;}
+.rr-bar{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:700;color:#fff;}
+.rr-val{font-weight:700;text-align:right;color:var(--forest);}
+
+/* ── HALLAZGOS ── */
+.hallazgo-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.hallazgo{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:1.25rem;border-left:3px solid var(--accent,var(--teal));}
+.hallazgo .num{font-size:30px;font-weight:800;color:var(--accent,var(--teal));opacity:.35;line-height:1;margin-bottom:.4rem;}
+.hallazgo h4{font-size:13px;font-weight:700;color:#fff;margin-bottom:.4rem;}
+.hallazgo p{font-size:11px;color:rgba(255,255,255,.65);line-height:1.6;}
+.hallazgo.red{--accent:var(--red);}
+.hallazgo.orange{--accent:#e07020;}
+
+/* ── ACCIONES ── */
+.acciones-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;}
+.accion{background:var(--white);border-radius:6px;padding:1.25rem;border:1px solid var(--border);border-top:3px solid var(--accent,var(--forest));}
+.accion.red{--accent:var(--red);}
+.accion.orange{--accent:#d97706;}
+.accion.amber{--accent:var(--amber);}
+.accion .urgencia{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:.4rem;}
+.accion h4{font-size:13px;font-weight:700;color:var(--forest);margin-bottom:.4rem;}
+.accion p{font-size:11px;color:var(--text2);line-height:1.6;}
+
+/* ── FOOTER ── */
+footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-align:center;padding:14px;border-top:2px solid var(--teal);margin-left:28px;}
+
+@media(max-width:768px){.chart-grid,.hallazgo-grid,.acciones-grid{grid-template-columns:1fr;}.hero-kpis{grid-template-columns:1fr 1fr;}nav a{display:none;}.chart-grid{grid-template-columns:1fr;}}
+
+
+    .kpi-trend{background:var(--white);padding:14px 18px;position:relative;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+    .kpi-trend::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kt-color,var(--teal));}
+    .kpi-trend .kt-title{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem;}
+    .kpi-trend .kt-main{display:flex;align-items:baseline;gap:.5rem;margin-bottom:.75rem;}
+    .kpi-trend .kt-saldo{font-size:24px;font-weight:800;color:var(--kt-color,var(--forest));line-height:1;}
+    .kpi-trend .kt-pct{font-size:12px;font-weight:600;color:var(--text3);}
+    .kpi-trend .kt-weeks{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;}
+    .kpi-trend .kt-week{background:rgba(31,85,86,.04);border-radius:4px;padding:5px 6px;text-align:center;}
+    .kpi-trend .kt-week-date{font-size:9px;color:var(--text3);font-weight:600;display:block;margin-bottom:2px;}
+    .kpi-trend .kt-week-sal{font-size:12px;font-weight:700;color:var(--text);display:block;}
+    .kpi-trend .kt-week-delta{font-size:10px;font-weight:700;display:block;margin-top:1px;}
+    .kt-up{color:var(--red);} .kt-dn{color:var(--green);} .kt-neu{color:var(--text3);}
+    .kt-last{background:rgba(17,171,171,.08)!important;border:1px solid rgba(17,171,171,.2);}
+  
+
+.ma-btn{padding:4px 12px;font-size:11px;font-weight:600;background:#fff;border:1px solid #d4dada;border-radius:4px;cursor:pointer;color:#4a6060;transition:all .15s;font-family:inherit}
+.ma-btn:hover{background:#f0f8f8;border-color:var(--teal)}
+.ma-btn.active{background:var(--forest);color:#fff;border-color:var(--forest)}
+
+
+.tk-trend{background:#f7f9f9;border-radius:4px;padding:12px 14px;margin:6px 0 14px}
+.tk-trend-title{font-size:11px;font-weight:700;color:var(--forest);letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
+.tk-trend-tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.tk-trend-tbl th{text-align:right;padding:6px 8px;color:#8a9a9a;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #d4dada}
+.tk-trend-tbl th:first-child{text-align:left}
+.tk-trend-tbl td{text-align:right;padding:5px 8px;color:#2a3a3a;border-bottom:1px dashed #eef1f2}
+.tk-trend-tbl td.tk-tn{text-align:left;font-weight:600;color:var(--forest)}
+.tk-trend-tbl td.tk-now,.tk-trend-tbl th.tk-now{background:rgba(17,171,171,.07);font-weight:700;color:var(--forest)}
+.tk-trend-tbl tr.tk-imor td{border-top:1px solid #d4dada;font-weight:700;padding-top:7px}
+.tk-trend-tbl .tk-up{color:#1F7A1F;font-weight:600}
+.tk-trend-tbl .tk-down{color:#c0392b;font-weight:600}
+.tk-pq{font-size:8px;color:#8a9a9a;display:block;text-transform:none;letter-spacing:0;font-weight:500}
+.tk-trend-note{font-size:11px;color:#4a6060;font-style:italic;margin-top:10px;line-height:1.5;padding-top:8px;border-top:1px solid #d4dada}
+
+/* Takeaways semanales */
+#takeaways .tk-grid{display:flex;flex-direction:column;gap:14px}
+.tk-card{background:#fff;border:1px solid #e5e9ea;border-left:4px solid var(--forest);border-radius:6px;padding:18px 22px}
+.tk-head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid #eef1f2;padding-bottom:10px;margin-bottom:14px}
+.tk-date{font-size:15px;font-weight:700;color:var(--forest);letter-spacing:.02em}
+.tk-meta{font-size:11px;color:#8a9a9a;text-transform:uppercase;letter-spacing:.08em}
+.tk-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.tk-kpi{display:flex;flex-direction:column;align-items:flex-start;padding:10px 12px;background:#f7f9f9;border-radius:4px}
+.tk-kpi-lbl{font-size:10px;color:#8a9a9a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.tk-kpi-val{font-size:18px;font-weight:800;color:var(--forest);margin-bottom:2px}
+.tk-kpi-d{font-size:11px;font-weight:600}
+.tk-up{color:#1F7A1F}
+.tk-down{color:#c0392b}
+.tk-points{margin:0;padding:0;list-style:none}
+.tk-points li{font-size:13px;line-height:1.55;color:#2a3a3a;padding:8px 0 8px 22px;border-bottom:1px dashed #eef1f2;position:relative}
+.tk-points li:last-child{border-bottom:none}
+.tk-points li:before{content:"▸";position:absolute;left:6px;color:var(--teal);font-weight:bold}
+.tk-points b{color:var(--forest)}
+@media(max-width:900px){.tk-kpis{grid-template-columns:repeat(2,1fr)}}
+
+/* === REGLAS DE IMPRESIÓN === */
+@page {
+  size: A4 landscape;
+  margin: 12mm 10mm;
+}
+@media print {
+  /* Forzar fondos e colores */
+  *, *:before, *:after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  body { background:#fff !important; font-size:10px; }
+  nav { display:none !important; }
+  footer { font-size:9px; padding:6px 0; }
+  .ma-btn, .mat-btn, .bucket-btn, .toggle-btn { display:none !important; }
+  /* Evitar cortar bloques */
+  .section, .chart-box, .tk-card, article, table { page-break-inside: avoid; break-inside: avoid; }
+  .section-label, h2, h3, h4 { page-break-after: avoid; break-after: avoid; }
+  /* Forzar nueva pagina antes de cada section grande */
+  section.section { page-break-before: auto; }
+  section#takeaways, section#tren, section#mora-temprana, section#vintages { page-break-before: page; break-before: page; }
+  section#resumen { page-break-before: avoid; }
+  /* Charts: tamano fijo razonable, evitar canvas gigante */
+  .chart-wrap { height: 180px !important; }
+  canvas { max-height: 180px !important; max-width: 100% !important; }
+  .chart-grid { display:grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+  .chart-box { padding: 8px !important; box-shadow: none !important; border: 1px solid #d4dada !important; }
+  /* Hero ajustes */
+  .hero-kpis { grid-template-columns: repeat(4,1fr) !important; }
+  .hero-kpi .v { font-size: 18px !important; }
+  /* Takeaway grid */
+  .tk-kpis { grid-template-columns: repeat(5,1fr) !important; gap: 4px !important; }
+  .tk-kpi-val { font-size: 13px !important; }
+  .tk-kpi-lbl, .tk-kpi-d { font-size: 9px !important; }
+  .tk-trend-tbl { font-size: 9.5px !important; }
+  .tk-points li { font-size: 10.5px !important; line-height: 1.45 !important; padding: 4px 0 4px 18px !important; }
+  /* Tablas ajuste */
+  table { font-size: 10px !important; }
+  th, td { padding: 4px 6px !important; }
+  /* Quitar sombras */
+  .section, .chart-box, .kpi-trend, .tk-card { box-shadow: none !important; }
+  /* Hero color */
+  #resumen { background: var(--forest) !important; -webkit-print-color-adjust:exact !important; }
+}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-label">VEMO · LTO</div>
+  <div class="sidebar-dot"></div>
+  <div class="sidebar-bottom">Strictly Private &amp; Confidential</div>
+</div>
+<main>
+<nav>
+  <div class="brand">VEMO <span>·</span> LTO</div>
+  <div class="nav-divider"></div>
+  <div class="nav-subtitle">Análisis de Cartera · Mayo 2025 – Mayo 2026</div>
+  <a href="#resumen">Resumen</a>
+  <a href="#tren">Tren</a>
+  <a href="#mora-temprana">Mora temprana</a>
+  <a href="#vintages">Vintages</a>
+  <span class="nav-badge">7-jun-26</span>
+  <span class="nav-conf">Confidencial</span>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="resumen">
+  <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.75rem">VEMO · LTO PORTFOLIO · MAYO 2025 – MAYO 2026</div>
+  <h1>Cartera Semanal <span>LTO</span></h1>
+  <p class="tagline">Análisis de mora temprana, tren de cartera, matrices de transición WAS/IS y evolución de vintages · Mayo 2025 – Mayo 2026</p>
+  <div class="hero-kpis">
+    <div class="hero-kpi"><div class="v" style="color:var(--ice)">$1,108 M</div><div class="l">Cartera total 7-jun-26</div><div class="s">+59% vs may-25 ($698M)</div></div>
+    <div class="hero-kpi"><div class="v" style="color:#FDA4AF">61.8%</div><div class="l">Mora total 7-jun-26</div><div class="s">vs 26.0% en may-25 (+35.8pp)</div></div>
+    <div class="hero-kpi"><div class="v" style="color:#FCD34D">20.5%</div><div class="l">IMOR 30+ días</div><div class="s">vs 7.6% en may-25 (+12.9pp)</div></div>
+    <div class="hero-kpi"><div class="v" style="color:#6EE7B7">3,797</div><div class="l">Contratos activos</div><div class="s">3,437 clientes únicos · +59% vs may-25</div></div>
+  </div>
+
+  <!-- Evolución semanal por bucket -->
+  <div style="margin-top:2rem;overflow-x:auto;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.15)">
+    <table style="width:100%;border-collapse:collapse;font-size:12px;font-family:'Space Grotesk',sans-serif;background:#fff">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:9px 14px;background:#1F5556;color:rgba(255,255,255,.6);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.1)">Bucket</th><th style="text-align:center;padding:9px 14px;background:#1F5556;color:rgba(255,255,255,.6);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.1)">17-may-26</th><th style="text-align:center;padding:9px 14px;background:#1F5556;color:rgba(255,255,255,.6);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.1)">24-may-26</th><th style="text-align:center;padding:9px 14px;background:#1F5556;color:rgba(255,255,255,.6);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.1)">31-may-26</th><th style="text-align:center;padding:9px 14px;background:#11ABAB;color:#fff;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(0,0,0,.1);border-left:1px solid rgba(0,0,0,.08)">7-jun-26 ▲</th><th style="text-align:center;padding:9px 14px;background:#1F5556;color:rgba(255,255,255,.6);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.1)">Δ WoW</th><th style="text-align:center;padding:9px 14px;background:#1F5556;color:rgba(255,255,255,.6);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.1)">Δ 4w</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid rgba(31,85,86,.07)">
+          <td style="padding:9px 14px;font-weight:700;color:#11ABAB;font-size:12px">Al corriente</td>
+<td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$510M</span><span style="font-size:10px;color:#8a9a9a">47.0%</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$524M</span><span style="font-size:10px;color:#8a9a9a">47.7%</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$521M</span><span style="font-size:10px;color:#8a9a9a">47.0%</span></td><td style="padding:9px 14px;text-align:center;background:rgba(17,171,171,.06);border-left:2px solid #11ABAB"><span style="font-size:13px;font-weight:800;display:block;color:#11ABAB">$423M</span><span style="font-size:10px;color:#8a9a9a">38.2%</span></td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#c0392b">-8.8 pp</td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#c0392b">-8.8 pp</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(31,85,86,.07)">
+          <td style="padding:9px 14px;font-weight:700;color:#f59e0b;font-size:12px">1-14 días</td>
+<td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$233M</span><span style="font-size:10px;color:#8a9a9a">21.5%</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$238M</span><span style="font-size:10px;color:#8a9a9a">21.7%</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$259M</span><span style="font-size:10px;color:#8a9a9a">23.4%</span></td><td style="padding:9px 14px;text-align:center;background:rgba(17,171,171,.06);border-left:2px solid #11ABAB"><span style="font-size:13px;font-weight:800;display:block;color:#f59e0b">$347M</span><span style="font-size:10px;color:#8a9a9a">31.3%</span></td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#c0392b">+7.9 pp</td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#c0392b">+9.8 pp</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(31,85,86,.07)">
+          <td style="padding:9px 14px;font-weight:700;color:#d97706;font-size:12px">15-29 días</td>
+<td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$102M</span><span style="font-size:10px;color:#8a9a9a">9.4%</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$102M</span><span style="font-size:10px;color:#8a9a9a">9.3%</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$92M</span><span style="font-size:10px;color:#8a9a9a">8.3%</span></td><td style="padding:9px 14px;text-align:center;background:rgba(17,171,171,.06);border-left:2px solid #11ABAB"><span style="font-size:13px;font-weight:800;display:block;color:#d97706">$111M</span><span style="font-size:10px;color:#8a9a9a">10.1%</span></td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#c0392b">+1.8 pp</td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#c0392b">+0.7 pp</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(31,85,86,.07)">
+          <td style="padding:9px 14px;font-weight:700;color:#c0392b;font-size:12px">30-60 días</td>
+<td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$125M</span><span style="font-size:10px;color:#8a9a9a">11.5%</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$124M</span><span style="font-size:10px;color:#8a9a9a">11.3%</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$121M</span><span style="font-size:10px;color:#8a9a9a">11.0%</span></td><td style="padding:9px 14px;text-align:center;background:rgba(17,171,171,.06);border-left:2px solid #11ABAB"><span style="font-size:13px;font-weight:800;display:block;color:#c0392b">$113M</span><span style="font-size:10px;color:#8a9a9a">10.2%</span></td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#11ABAB">-0.8 pp</td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#11ABAB">-1.3 pp</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(31,85,86,.07)">
+          <td style="padding:9px 14px;font-weight:700;color:#e05c4b;font-size:12px">61-90 días</td>
+<td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$47M</span><span style="font-size:10px;color:#8a9a9a">4.4%</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$46M</span><span style="font-size:10px;color:#8a9a9a">4.2%</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$50M</span><span style="font-size:10px;color:#8a9a9a">4.5%</span></td><td style="padding:9px 14px;text-align:center;background:rgba(17,171,171,.06);border-left:2px solid #11ABAB"><span style="font-size:13px;font-weight:800;display:block;color:#e05c4b">$51M</span><span style="font-size:10px;color:#8a9a9a">4.6%</span></td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#c0392b">+0.1 pp</td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#c0392b">+0.2 pp</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(31,85,86,.07)">
+          <td style="padding:9px 14px;font-weight:700;color:#7b1d1d;font-size:12px">+91 días</td>
+<td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$68M</span><span style="font-size:10px;color:#8a9a9a">6.3%</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$65M</span><span style="font-size:10px;color:#8a9a9a">5.9%</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:700;display:block;color:#1a2424">$65M</span><span style="font-size:10px;color:#8a9a9a">5.8%</span></td><td style="padding:9px 14px;text-align:center;background:rgba(17,171,171,.06);border-left:2px solid #11ABAB"><span style="font-size:13px;font-weight:800;display:block;color:#7b1d1d">$63M</span><span style="font-size:10px;color:#8a9a9a">5.7%</span></td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#11ABAB">-0.1 pp</td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#11ABAB">-0.6 pp</td>
+        </tr>
+        <tr style="border-top:2px solid rgba(31,85,86,.15);background:rgba(31,85,86,.04)">
+          <td style="padding:9px 14px;font-weight:700;color:#4a6060;font-size:11px;text-transform:uppercase;letter-spacing:.05em">Total cartera</td>
+<td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:800;display:block;color:#1a2424">$1,085M</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:800;display:block;color:#1a2424">$1,098M</span></td><td style="padding:9px 14px;text-align:center"><span style="font-size:13px;font-weight:800;display:block;color:#1a2424">$1,109M</span></td><td style="padding:9px 14px;text-align:center;background:rgba(17,171,171,.06);border-left:2px solid #11ABAB"><span style="font-size:14px;font-weight:800;display:block;color:#1F5556">$1,108M</span></td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#c0392b">$-1M</td><td style="padding:9px 14px;text-align:center;font-size:11px;font-weight:700;color:#11ABAB">+$23M</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- TAKEAWAYS SEMANALES -->
+<section class="section" id="takeaways">
+  <div class="section-label">Takeaways semanales <span style="font-size:10px;font-weight:500;opacity:.7">Lectura ejecutiva · VEMO</span></div>
+  <p class="subtitle">Cambios relevantes corte vs. corte · más recientes arriba</p>
+  <div class="tk-grid">
+      
+
+      <article class="tk-card" data-week="2026-06-07">
+        <div class="tk-head">
+          <div class="tk-date">Corte al 7-jun-2026</div>
+          <div class="tk-meta">vs. 31-may-2026 · WoW</div>
+        </div>
+        <div class="tk-kpis">
+          <div class="tk-kpi"><span class="tk-kpi-lbl">Cartera</span><span class="tk-kpi-val">$1,108M</span><span class="tk-kpi-d tk-down">-$1M / -0.1%</span></div>
+          <div class="tk-kpi"><span class="tk-kpi-lbl">Al corriente</span><span class="tk-kpi-val">38.2%</span><span class="tk-kpi-d tk-down">-8.8 pp</span></div>
+          <div class="tk-kpi"><span class="tk-kpi-lbl">Mora temprana 1-29d</span><span class="tk-kpi-val">61.8%</span><span class="tk-kpi-d tk-down">+8.8 pp</span></div>
+          <div class="tk-kpi"><span class="tk-kpi-lbl">IMOR 30+</span><span class="tk-kpi-val">20.5%</span><span class="tk-kpi-d tk-up">-0.8 pp</span></div>
+          <div class="tk-kpi"><span class="tk-kpi-lbl">+91 días</span><span class="tk-kpi-val">5.7%</span><span class="tk-kpi-d tk-up">-0.1 pp</span></div>
+        </div>
+
+        <div class="tk-trend">
+          <div class="tk-trend-title">Tendencia últimas 4 semanas (% sobre cartera)</div>
+          <table class="tk-trend-tbl">
+            <thead>
+              <tr><th>Bucket</th><th>17-may</th><th>24-may</th><th>31-may</th><th class="tk-now">7-jun</th><th>Δ WoW</th><th>Δ 4w</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="tk-tn">Al corriente</td><td>47.0%</td><td>47.7%</td><td>47.0%</td><td class="tk-now">38.2%</td><td class="tk-down">-8.8 pp</td><td class="tk-down">-8.8 pp</td></tr>
+<tr><td class="tk-tn">1-14 días</td><td>21.5%</td><td>21.7%</td><td>23.4%</td><td class="tk-now">31.3%</td><td class="tk-down">+7.9 pp</td><td class="tk-down">+9.8 pp</td></tr>
+<tr><td class="tk-tn">15-29 días</td><td>9.4%</td><td>9.3%</td><td>8.3%</td><td class="tk-now">10.1%</td><td class="tk-down">+1.8 pp</td><td class="tk-down">+0.7 pp</td></tr>
+<tr><td class="tk-tn">30-60 días</td><td>11.5%</td><td>11.3%</td><td>11.0%</td><td class="tk-now">10.2%</td><td class="tk-up">-0.8 pp</td><td class="tk-up">-1.3 pp</td></tr>
+<tr><td class="tk-tn">61-90 días</td><td>4.4%</td><td>4.2%</td><td>4.5%</td><td class="tk-now">4.6%</td><td class="tk-down">+0.1 pp</td><td class="tk-down">+0.2 pp</td></tr>
+<tr><td class="tk-tn">+91 días</td><td>6.3%</td><td>5.9%</td><td>5.8%</td><td class="tk-now">5.7%</td><td class="tk-up">-0.1 pp</td><td class="tk-up">-0.6 pp</td></tr>
+<tr class="tk-imor"><td class="tk-tn"><b>IMOR 30+</b></td><td>22.1%</td><td>21.4%</td><td>21.3%</td><td class="tk-now">20.5%</td><td class="tk-up">-0.8 pp</td><td class="tk-up">-1.6 pp</td></tr>
+            </tbody>
+          </table>
+          <div class="tk-trend-note">Referencia 17-may. Δ 4w: IMOR 30+ -0.8 pp respecto a 17-may.</div>
+        </div>
+
+        <ul class="tk-points">
+          <li><b>IMOR 30+ mejora 0.8 pp WoW, de 21.3% a 20.5%.</b> Impulsado por 61-90d (+0.1 pp, $51M) y +91d (-0.1 pp, $63M). Ambos tramos mantienen tendencia alcista; el pipeline de deterioro sigue activo.</li>
+          <li><b>Movimiento dominante de la semana: corriente → 1-14d.</b> Al corriente cae -98M (-8.8 pp); 1-14d sube +88M (+7.9 pp). 15-29d se mantiene estable (+1.8 pp). <em>[Confirmar si responde a vencimientos de cierre de mes o deterioro estructural.]</em></li>
+          <li><b>Pipeline a mora alta: 61-90d en 4.6% ($51M), +0.1 pp WoW.</b> 30-60d también sube -0.8 pp a 10.2% ($113M). Con tasas de roll-forward históricas de ~47% en 61-90d y ~21% en 30-60d, el flujo esperado a +91d en las próximas semanas es aprox. $48M.</li>
+          <li><b>Cartera total -$1M / -0.1%. Total a $1,108M.</b> El salto en mora temprana (corriente 47.0%→38.2%, 1-14d 23.4%→31.3%) responde a un efecto de fecha de corte: el corte dominical captura semanalidades aún no pagadas, concentrando el movimiento en 1-14d. Se espera normalización al siguiente corte; IMOR 30+ mejoró a 20.5%.</li>
+        </ul>
+      </article>
+
+      <article class="tk-card" data-week="2026-05-31">
+        <div class="tk-head">
+          <div class="tk-date">Corte al 31-may-2026</div>
+          <div class="tk-meta">vs. 24-may-2026 · WoW</div>
+        </div>
+        <div class="tk-kpis">
+          <div class="tk-kpi"><span class="tk-kpi-lbl">Cartera</span><span class="tk-kpi-val">$1,109M</span><span class="tk-kpi-d tk-up">+$11M / +1.0%</span></div>
+          <div class="tk-kpi"><span class="tk-kpi-lbl">Al corriente</span><span class="tk-kpi-val">47.0%</span><span class="tk-kpi-d tk-down">-0.7 pp</span></div>
+          <div class="tk-kpi"><span class="tk-kpi-lbl">Mora temprana 1-29d</span><span class="tk-kpi-val">53.0%</span><span class="tk-kpi-d tk-down">+0.7 pp</span></div>
+          <div class="tk-kpi"><span class="tk-kpi-lbl">IMOR 30+</span><span class="tk-kpi-val">21.3%</span><span class="tk-kpi-d tk-up">-0.1 pp</span></div>
+          <div class="tk-kpi"><span class="tk-kpi-lbl">+91 días</span><span class="tk-kpi-val">5.8%</span><span class="tk-kpi-d tk-up">-0.1 pp</span></div>
+        </div>
+
+        <ul class="tk-points">
+          <li><b>IMOR 30+ mejora 0.1 pp WoW, de 21.4% a 21.3%.</b> Impulsado por 61-90d (+0.3 pp, $50M) y +91d (-0.1 pp, $65M). Ambos tramos mantienen tendencia alcista; el pipeline de deterioro sigue activo.</li>
+          <li><b>Movimiento dominante de la semana: corriente → 1-14d.</b> Al corriente cae -3M (-0.7 pp); 1-14d sube +21M (+1.7 pp). 15-29d se mantiene estable (-1.0 pp). <em>[Confirmar si responde a vencimientos de cierre de mes o deterioro estructural.]</em></li>
+          <li><b>Pipeline a mora alta: 61-90d en 4.5% ($50M), +0.3 pp WoW.</b> 30-60d también sube -0.3 pp a 11.0% ($121M). Con tasas de roll-forward históricas de ~47% en 61-90d y ~21% en 30-60d, el flujo esperado a +91d en las próximas semanas es aprox. $49M.</li>
+          <li><b>Cartera total +$11M / +1.0%. Total a $1,109M.</b> <em>[Completar con causas reales del movimiento: colocaciones nuevas, pagos recibidos, recuperaciones o recolocaciones.]</em></li>
+        </ul>
+      </article>
+      
+      
+      
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+  </div>
+</section>
+
+<!-- TREN -->
+<section class="section" id="tren">
+  <div class="section-label">Tren de cartera <span style="font-size:10px;font-weight:500;opacity:.7">01 · Evolución histórica</span></div>
+  <p class="subtitle">Mayo 2025 – Mayo 2026 · 42 cortes · MXN Millones</p>
+  <div class="alert amber"><strong>Punto de inflexión — Octubre 2025:</strong> La mora total superó el 50% por primera vez. El bucket corriente colapsó de 65% a 44% en un mes y no se ha recuperado.</div>
+  <div class="chart-grid one" style="margin-bottom:1.5rem">
+    <div class="chart-box">
+      <h4>Estructura de cartera 100% — corriente (base) hacia mora (arriba)</h4>
+      <div class="chart-wrap" style="height:320px"><canvas id="chartTren"></canvas></div>
+    </div>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-box">
+      <h4>Cartera total vs. mora 1-29 días (MXN M)</h4>
+      <div class="chart-wrap"><canvas id="chartTotal"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <h4>Corriente vs. mora total (%)</h4>
+      <div class="chart-wrap"><canvas id="chartMoraCorriente"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- MORA TEMPRANA -->
+<section class="section" id="mora-temprana">
+  <div class="section-label">Mora temprana <span style="font-size:10px;font-weight:500;opacity:.7">02 · Señal temprana</span></div>
+  <p class="subtitle">Buckets 1-14 días y 15-29 días · Primera señal de deterioro</p>
+  
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);border-radius:6px;overflow:hidden;background:rgba(31,85,86,.06);margin-bottom:2rem">
+    <div class="kpi-trend" style="--kt-color:var(--ice)">
+      <div class="kt-title">Al corriente</div>
+      <div class="kt-main"><span class="kt-saldo">$423M</span><span class="kt-pct">38.2%</span></div>
+      <div class="kt-weeks">
+        <div class="kt-week"><span class="kt-week-date">17-may</span><span class="kt-week-sal">$510M</span><span class="kt-week-delta kt-dn">-$7M</span></div>
+        <div class="kt-week"><span class="kt-week-date">24-may</span><span class="kt-week-sal">$524M</span><span class="kt-week-delta kt-up">+$14M</span></div>
+        <div class="kt-week"><span class="kt-week-date">31-may</span><span class="kt-week-sal">$521M</span><span class="kt-week-delta kt-dn">-$3M</span></div>
+        <div class="kt-week kt-last"><span class="kt-week-date">7-jun</span><span class="kt-week-sal">$423M</span><span class="kt-week-delta kt-dn">-$98M</span></div>
+      </div>
+    </div>
+    <div class="kpi-trend" style="--kt-color:var(--orange)">
+      <div class="kt-title">1-14 días</div>
+      <div class="kt-main"><span class="kt-saldo">$347M</span><span class="kt-pct">31.3%</span></div>
+      <div class="kt-weeks">
+        <div class="kt-week"><span class="kt-week-date">17-may</span><span class="kt-week-sal">$233M</span><span class="kt-week-delta kt-dn">-$4M</span></div>
+        <div class="kt-week"><span class="kt-week-date">24-may</span><span class="kt-week-sal">$238M</span><span class="kt-week-delta kt-up">+$5M</span></div>
+        <div class="kt-week"><span class="kt-week-date">31-may</span><span class="kt-week-sal">$259M</span><span class="kt-week-delta kt-up">+$21M</span></div>
+        <div class="kt-week kt-last"><span class="kt-week-date">7-jun</span><span class="kt-week-sal">$347M</span><span class="kt-week-delta kt-up">+$88M</span></div>
+      </div>
+    </div>
+    <div class="kpi-trend" style="--kt-color:var(--red)">
+      <div class="kt-title">15-29 días</div>
+      <div class="kt-main"><span class="kt-saldo">$111M</span><span class="kt-pct">10.1%</span></div>
+      <div class="kt-weeks">
+        <div class="kt-week"><span class="kt-week-date">17-may</span><span class="kt-week-sal">$102M</span><span class="kt-week-delta kt-dn">-$1M</span></div>
+        <div class="kt-week"><span class="kt-week-date">24-may</span><span class="kt-week-sal">$102M</span><span class="kt-week-delta kt-neu">$0M</span></div>
+        <div class="kt-week"><span class="kt-week-date">31-may</span><span class="kt-week-sal">$92M</span><span class="kt-week-delta kt-dn">-$10M</span></div>
+        <div class="kt-week kt-last"><span class="kt-week-date">7-jun</span><span class="kt-week-sal">$111M</span><span class="kt-week-delta kt-up">+$19M</span></div>
+      </div>
+    </div>
+    <div class="kpi-trend" style="--kt-color:var(--red);border-right:none">
+      <div class="kt-title">IMOR 30+ días</div>
+      <div class="kt-main"><span class="kt-saldo">$227M</span><span class="kt-pct">20.5%</span></div>
+      <div class="kt-weeks">
+        <div class="kt-week"><span class="kt-week-date">17-may</span><span class="kt-week-sal">$240M</span><span class="kt-week-delta kt-up">+$4M</span></div>
+        <div class="kt-week"><span class="kt-week-date">24-may</span><span class="kt-week-sal">$235M</span><span class="kt-week-delta kt-dn">-$5M</span></div>
+        <div class="kt-week"><span class="kt-week-date">31-may</span><span class="kt-week-sal">$236M</span><span class="kt-week-delta kt-up">+$1M</span></div>
+        <div class="kt-week kt-last"><span class="kt-week-date">7-jun</span><span class="kt-week-sal">$227M</span><span class="kt-week-delta kt-dn">-$9M</span></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toggle moving average -->
+  <div style="display:flex;align-items:center;gap:10px;margin:1rem 0 .5rem;font-size:12px;color:#4a6060">
+    <span style="font-weight:700;color:var(--forest);letter-spacing:.04em;text-transform:uppercase;font-size:11px">Promedio móvil:</span>
+    <button onclick="setMA(0,this)" class="ma-btn">Off</button>
+    <button onclick="setMA(4,this)" class="ma-btn active">4 semanas</button>
+    <button onclick="setMA(8,this)" class="ma-btn">8 semanas</button>
+    <span style="font-size:11px;color:#8a9a9a">— línea punteada tenue sobre cada gráfica</span>
+  </div>
+  <!-- Fila 1: panorama (corriente + 1-29 agregado) -->
+  <div class="chart-grid" style="margin-top:.5rem">
+    <div class="chart-box">
+      <h4>Al corriente — evolución (%) · v2 corregida 12-jun</h4>
+      <div class="chart-wrap"><canvas id="chartCorriente"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <h4>Mora temprana 1-29 días — evolución (%)</h4>
+      <div class="chart-wrap"><canvas id="chartMoraTemp"></canvas></div>
+    </div>
+  </div>
+  <!-- Fila 2: 1-14 + 15-29 -->
+  <div class="chart-grid" style="margin-top:1rem">
+    <div class="chart-box">
+      <h4>1-14 días — evolución (%)</h4>
+      <div class="chart-wrap"><canvas id="chartM114"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <h4>15-29 días — evolución (%)</h4>
+      <div class="chart-wrap"><canvas id="chartM1529"></canvas></div>
+    </div>
+  </div>
+  <!-- Fila 3: 30-60 + 61-90 -->
+  <div class="chart-grid" style="margin-top:1rem">
+    <div class="chart-box">
+      <h4>30-60 días — evolución (%)</h4>
+      <div class="chart-wrap"><canvas id="chartM3060"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <h4>61-90 días — evolución (%)</h4>
+      <div class="chart-wrap"><canvas id="chartM6190"></canvas></div>
+    </div>
+  </div>
+  <!-- Fila 4: +91 + IMOR 30+ agregado -->
+  <div class="chart-grid" style="margin-top:1rem">
+    <div class="chart-box">
+      <h4>+91 días — evolución (%)</h4>
+      <div class="chart-wrap"><canvas id="chartM91p"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <h4>IMOR 30+ días — evolución</h4>
+      <div class="chart-wrap"><canvas id="chartIMOR"></canvas></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- VINTAGES -->
+<section class="section" id="vintages">
+  <div class="section-label">Vintages — calidad por trimestre de originación <span style="font-size:10px;font-weight:500;opacity:.7">03 · Análisis de cosechas</span></div>
+  <p class="subtitle">Estado al 28-Abr-2026 · Comparación entre cohorts</p>
+  <div class="alert red"><strong>Hallazgo clave:</strong> Los vintages 2025-Q3 y 2025-Q4 (35% del saldo, $378M) ya registran IMOR de 28-33% con menos de 18 meses de vida. Las colocaciones recientes deterioran antes de madurar.</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;align-items:start">
+    <div class="chart-box">
+      <h4>Composición 100% por bucket y vintage</h4>
+      <div class="chart-wrap" style="height:340px"><canvas id="chartVintageStacked"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <h4>Tabla detallada de vintages al 28-Abr-2026</h4>
+      <div style="overflow-x:auto;margin-top:.5rem">
+      <table style="font-size:12px">
+        <thead><tr>
+          <th style="text-align:left;padding:8px 10px">Vintage</th>
+          <th style="padding:8px 6px">Contratos</th>
+          <th style="padding:8px 6px">Saldo</th>
+          <th style="padding:8px 6px">Corriente</th>
+          <th style="padding:8px 6px">1-29d</th>
+          <th style="padding:8px 6px">30-60d</th>
+          <th style="padding:8px 6px">61-90d</th>
+          <th style="padding:8px 6px">+91d</th>
+          <th style="padding:8px 6px">IMOR</th>
+        </tr></thead>
+        <tbody id="vintTable"></tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+  <div class="chart-grid">
+    <div class="chart-box">
+      <h4>IMOR 30+ días por vintage (%)</h4>
+      <div class="chart-wrap"><canvas id="chartVintageIMOR"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <h4>Saldo por vintage (MXN M)</h4>
+      <div class="chart-wrap"><canvas id="chartVintageSaldo"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROLL RATES -->
+<!-- MATRICES WAS/IS -->
+<footer>Análisis de Cartera LTO · VEMO · Mayo 2025 – Mayo 2026 · Uso interno confidencial</footer>
+
+<script>
+// DATA
+const dates42=["30-may","10-jun","17-jun","24-jun","30-jun","8-jul","15-jul","22-jul","29-jul","31-jul","12-ago","19-ago","31-ago","9-sep","17-sep","23-sep","29-sep","30-sep","7-oct","14-oct","21-oct","28-oct","31-oct","4-nov","11-nov","18-nov","30-nov","24-dic","31-dic","20-ene","28-ene","31-ene","17-feb","24-feb","28-feb","10-mar","24-mar","31-mar","16-abr","20-abr","28-abr","30-abr","10-may","17-may","24-may","31-may","7-jun"];
+const total42=[697.8,695.0,702.2,711.4,742.8,742.5,746.5,761.0,761.5,791.3,794.1,796.1,832.3,836.0,844.2,844.6,833.4,874.4,875.8,861.5,892.6,909.3,917.6,892.2,920.9,935.6,955.7,985.9,986.1,1015.5,1016.7,1000.4,1018.8,1033.7,1039.1,1051.1,1051.0,1062.3,1075.0,1091.8,1089.2,1093.6,1092.6,1085.0,1098.1,1108.8,1107.7];
+const corr42=[74.0,75.1,74.8,75.3,75.9,74.1,72.4,71.7,72.2,76.9,68.7,67.4,66.5,64.9,65.3,62.5,63.7,65.7,62.6,60.9,59.8,48.1,44.7,63.2,44.4,60.2,61.9,58.3,60.6,49.5,48.9,51.6,46.7,53.1,51.9,52.2,51.8,55.7,46.2,45.3,45.7,53.8,47.3,47.0,47.7,47.0,38.2];
+const m114=[14.5,13.4,13.5,12.8,12.7,14.6,14.9,15.0,13.9,10.8,15.6,16.3,15.7,15.9,15.0,17.3,16.4,15.6,18.0,18.4,18.9,30.7,33.8,16.5,33.7,18.7,18.4,22.5,19.7,24.5,24.2,22.6,23.6,18.8,20.3,19.0,18.7,17.6,24.1,23.8,23.0,18.8,21.6,21.5,21.7,23.4,31.3];
+const m1529=[3.9,4.3,4.6,4.5,4.4,4.4,5.6,5.8,6.1,5.3,5.9,5.8,6.4,6.7,6.5,6.6,6.1,5.8,6.2,6.8,6.3,5.9,6.7,5.8,6.7,5.7,6.6,6.5,7.4,9.2,9.6,10.1,10.5,9.6,9.3,8.7,8.0,7.8,8.9,9.2,10.2,8.4,9.5,9.4,9.3,8.3,10.1];
+const m3060=[4.8,4.3,4.1,3.6,3.7,3.8,4.4,4.8,5.3,4.0,5.6,5.9,7.1,7.5,5.7,7.4,6.1,5.8,5.8,7.4,7.0,6.8,8.0,7.8,8.0,7.7,6.6,6.8,6.0,7.9,8.0,8.7,11.4,9.9,9.6,11.5,11.8,9.0,10.9,10.7,10.3,8.5,11.0,11.5,11.3,11.0,10.2];
+const m6190=[1.7,1.7,1.6,2.0,1.8,1.5,1.1,0.9,1.0,1.6,2.7,2.9,2.2,2.3,4.2,2.8,4.3,4.1,4.4,3.4,4.7,4.8,3.1,3.0,3.1,3.2,2.9,2.6,2.8,4.3,4.5,5.1,4.4,5.4,5.4,4.4,5.1,6.1,5.1,5.0,4.8,5.5,4.7,4.4,4.2,4.5,4.6];
+const m91p=[1.2,1.2,1.4,1.7,1.5,1.6,1.7,1.7,1.6,1.6,1.5,1.8,2.1,2.8,3.3,3.3,3.4,3.0,3.0,3.2,3.4,3.9,3.6,3.7,4.1,4.5,3.5,3.4,3.5,4.5,4.9,2.0,3.3,3.4,3.4,4.2,4.5,3.8,4.9,5.9,6.0,4.8,5.9,6.3,5.9,5.8,5.7];
+const imor42=[7.6,7.2,7.1,7.4,7.0,6.9,7.2,7.5,7.8,7.1,9.9,10.6,11.4,12.6,13.2,13.6,13.8,12.9,13.2,13.9,15.0,15.4,14.8,14.5,15.2,15.4,13.0,12.7,12.3,16.8,17.4,15.7,19.2,18.6,18.4,20.1,21.5,18.9,20.8,21.6,21.1,18.9,21.6,22.1,21.4,21.3,20.5];
+
+// [quarter, contratos, cap_M, corr%, m114%, m1529%, m3060%, m6190%, m91p%, imor%]
+const vint=[
+  ["2024-Q2",179,36.4,64.1,19.5,5.0,6.6,2.9,1.9,11.5],
+  ["2024-Q3",205,46.5,56.3,24.7,8.7,5.8,1.3,3.1,10.2],
+  ["2024-Q4",187,53.6,64.7,18.8,4.9,6.2,2.9,2.5,11.6],
+  ["2025-Q1",186,58.3,52.7,21.0,6.8,12.9,1.2,5.4,19.5],
+  ["2025-Q2",333,104.0,41.7,21.9,9.8,11.0,6.4,9.2,26.6],
+  ["2025-Q3",414,138.7,40.2,21.4,10.0,10.7,5.3,12.4,28.4],
+  ["2025-Q4",732,238.9,35.0,20.5,11.3,14.7,9.3,9.2,33.2],
+  ["2026-Q1",842,281.3,40.2,31.8,15.0,9.9,2.6,0.4,13.0],
+  ["2026-Q2",257,85.4,84.3,14.4,0.9,0.4,0.0,0.0,0.4]
+];
+
+// Historical roll rates: 9 monthly periods
+const rPeriods=["may-jul","jul-sep","sep-oct","oct-nov","nov-dic","dic-ene","ene-feb","feb-mar","mar-abr","abr-may"];
+const rFwd={ // roll forward % by bucket
+  "0":    [14.0,23.9,43.4,11.9,17.6,27.3,18.3,12.9,28.8,17.9],
+  "1-14": [33.1,55.2,43.9,13.6,28.0,42.3,30.8,27.0,40.7,33.4],
+  "15-29":[30.1,50.5,66.9,40.7,47.0,62.8,51.8,50.3,59.0,51.7],
+  "30-60":[20.9,41.3,48.0,31.2,44.8,59.6,46.4,48.1,38.6,21.1],
+  "61-90":[51.4,70.4,54.8,49.5,56.2,38.0,41.2,40.6,53.9,46.7]
+};
+const rCure={
+  "0":    [0,0,0,0,0,0,0,0,0,0.0],
+  "1-14": [29.1,4.9,5.6,47.8,16.2,9.8,16.0,18.8,8.3,4.3],
+  "15-29":[18.7,4.1,7.1,16.7,6.7,7.8,11.5,13.4,7.8,1.9],
+  "30-60":[7.2,2.1,3.6,8.7,5.8,4.9,2.8,4.1,5.8,1.5],
+  "61-90":[0,0,0,2.8,2.3,2.8,1.0,1.4,1.2,0.7]
+};
+const rStay={
+  "0":    [84.2,75.2,55.9,87.9,81.5,72.3,81.0,86.6,70.9,81.9],
+  "1-14": [26.4,28.2,49.4,38.0,52.6,47.1,52.2,50.9,50.3,61.6],
+  "15-29":[18.5,8.9,20.7,37.8,31.0,23.8,30.7,31.0,29.3,38.3],
+  "30-60":[7.1,9.7,20.4,37.4,26.1,22.0,35.0,28.1,44.2,68.0],
+  "61-90":[0,0,9.9,14.2,5.5,16.9,35.1,25.9,22.0,42.3]
+};
+
+Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
+Chart.defaults.font.size=11;
+const TEAL="#11ABAB",FOREST="#1F5556",NAVY="#1F5556";
+const RED="#c0392b",ORANGE="#d97706",AMBER="#f59e0b",GREEN="#1a7a4a";
+const gOpts={color:"rgba(31,85,86,.07)",lineWidth:.5};
+const aOpts={color:"#4a6060",font:{size:10}};
+
+// CHART 1: 100% stacked area (corriente base)
+const c1=corr42;
+const c2=corr42.map((v,i)=>+(v+m114[i]).toFixed(2));
+const c3=c2.map((v,i)=>+(v+m1529[i]).toFixed(2));
+const c4=c3.map((v,i)=>+(v+m3060[i]).toFixed(2));
+const c5=c4.map((v,i)=>+(v+m6190[i]).toFixed(2));
+const c6=c5.map((v,i)=>+(v+m91p[i]).toFixed(2));
+new Chart(document.getElementById("chartTren"),{type:"line",data:{labels:dates42,datasets:[
+  {label:"Al corriente %",data:c1,borderColor:NAVY,backgroundColor:"rgba(31,85,86,.75)",fill:"origin",tension:.3,borderWidth:1,pointRadius:0},
+  {label:"1-14d %",data:c2,borderColor:"#d97706",backgroundColor:"rgba(240,165,0,.6)",fill:"-1",tension:.3,borderWidth:0,pointRadius:0},
+  {label:"15-29d %",data:c3,borderColor:ORANGE,backgroundColor:"rgba(224,112,32,.6)",fill:"-1",tension:.3,borderWidth:0,pointRadius:0},
+  {label:"30-60d %",data:c4,borderColor:"#C04010",backgroundColor:"rgba(180,83,9,.65)",fill:"-1",tension:.3,borderWidth:0,pointRadius:0},
+  {label:"61-90d %",data:c5,borderColor:RED,backgroundColor:"rgba(192,57,43,.65)",fill:"-1",tension:.3,borderWidth:0,pointRadius:0},
+  {label:"+91d %",data:c6,borderColor:"#7b1d1d",backgroundColor:"rgba(123,29,29,.7)",fill:"-1",tension:.3,borderWidth:0,pointRadius:0}
+]},options:{responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:true,position:"bottom",labels:{boxWidth:10,font:{size:10}}}},
+  scales:{x:{grid:gOpts,ticks:{...aOpts,maxRotation:45,autoSkip:false,callback:function(v,i,t){return (i===0||i===t.length-1||i%4===0)?this.getLabelForValue(v):"";}}},y:{grid:gOpts,ticks:{...aOpts,callback:function(v){return v+"%"},stepSize:20}}}}
+});
+
+// CHART 2: cartera total + mora 1-29d
+const mora129M=total42.map((t,i)=>+((m114[i]+m1529[i])/100*t).toFixed(1));
+new Chart(document.getElementById("chartTotal"),{type:"line",data:{labels:dates42,datasets:[
+  {label:"Cartera total",data:total42,borderColor:FOREST,backgroundColor:"rgba(31,85,86,.1)",fill:true,tension:.3,borderWidth:2.5,pointRadius:2},
+  {label:"Mora 1-29d (M)",data:mora129M,borderColor:ORANGE,backgroundColor:"rgba(224,112,32,.12)",fill:true,tension:.3,borderWidth:2,pointRadius:2,borderDash:[5,3]}
+]},options:{responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:true,position:"bottom",labels:{boxWidth:10,font:{size:10}}}},
+  scales:{x:{grid:gOpts,ticks:{...aOpts,maxRotation:45,autoSkip:false,callback:function(v,i,t){return (i===0||i===t.length-1||i%4===0)?this.getLabelForValue(v):"";}}},y:{grid:gOpts,ticks:{...aOpts,callback:function(v){return "$"+v+"M"}}}}}
+});
+
+// CHART 3: mora vs corriente
+const mora42=corr42.map((_,i)=>+(m114[i]+m1529[i]+m3060[i]+m6190[i]+m91p[i]).toFixed(1));
+new Chart(document.getElementById("chartMoraCorriente"),{type:"line",data:{labels:dates42,datasets:[
+  {label:"Mora total %",data:mora42,borderColor:RED,backgroundColor:"rgba(192,0,0,.12)",fill:true,tension:.3,borderWidth:2.5,pointRadius:1},
+  {label:"Al corriente %",data:corr42,borderColor:TEAL,backgroundColor:"rgba(17,171,171,.1)",fill:true,tension:.3,borderWidth:2,pointRadius:1,borderDash:[4,3]}
+]},options:{responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:true,position:"bottom",labels:{boxWidth:10,font:{size:10}}}},
+  scales:{x:{grid:gOpts,ticks:{...aOpts,maxRotation:45,autoSkip:false,callback:function(v,i,t){return (i===0||i===t.length-1||i%4===0)?this.getLabelForValue(v):"";}}},y:{grid:gOpts,ticks:{...aOpts,callback:function(v){return v+"%"}}}}}
+});
+
+// === Helper Moving Average ===
+function ma(arr, n){
+  if(!n||n<=1) return arr.map(()=>null);
+  const out=[];
+  for(let i=0;i<arr.length;i++){
+    if(i<n-1){ out.push(null); continue; }
+    let s=0; for(let j=0;j<n;j++) s+=arr[i-j];
+    out.push(+(s/n).toFixed(2));
+  }
+  return out;
+}
+window._maCharts = [];  // registro global
+window._maWindow = 4;   // default
+function registerMA(chart, series, color){
+  window._maCharts.push({chart, series, color});
+}
+function setMA(n, btn){
+  window._maWindow = n;
+  document.querySelectorAll('.ma-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  window._maCharts.forEach(({chart, series, color})=>{
+    // buscar dataset MA por flag persistente
+    const ds = chart.data.datasets.find(d => d._isMA);
+    if(ds){
+      ds.data = ma(series, n||4);  // mantener data calculada aunque este off
+      ds.label = n>0 ? 'MA-'+n+'w' : 'MA-4w';
+      ds.hidden = (n===0);
+    }
+    chart.update('none');
+  });
+}
+function maDataset(series, color){
+  return {label:'MA-4w',data:ma(series,4),borderColor:color,borderWidth:1.2,borderDash:[6,4],pointRadius:0,tension:.2,fill:false,order:0,_isMA:true};
+}
+
+// CHART 4: mora temprana
+const mtemp42=m114.map((v,i)=>+(v+m1529[i]).toFixed(1));
+{
+  const ch = new Chart(document.getElementById("chartMoraTemp"),{type:"line",data:{labels:dates42,datasets:[
+    {label:"1-29d total %",data:mtemp42,borderColor:FOREST,backgroundColor:"rgba(31,85,86,.1)",fill:true,tension:.3,borderWidth:2.5,pointRadius:1.5,order:2},
+    maDataset(mtemp42, "rgba(31,85,86,.55)")
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:true,position:"bottom",labels:{boxWidth:10,font:{size:10}}}},
+    scales:{x:{grid:gOpts,ticks:{...aOpts,maxRotation:45,autoSkip:false,callback:function(v,i,t){return (i===0||i===t.length-1||i%4===0)?this.getLabelForValue(v):"";}}},y:{grid:gOpts,ticks:{...aOpts,callback:function(v){return v+"%"}}}}}
+  });
+  registerMA(ch, mtemp42, "rgba(31,85,86,.55)");
+}
+
+// CHART 5: IMOR
+{
+  const ch = new Chart(document.getElementById("chartIMOR"),{type:"line",data:{labels:dates42,datasets:[
+    {label:"IMOR 30+",data:imor42,borderColor:RED,backgroundColor:"rgba(192,57,43,.12)",fill:true,tension:.3,borderWidth:2.5,pointRadius:2,order:2},
+    maDataset(imor42, "rgba(192,57,43,.55)")
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:gOpts,ticks:{...aOpts,maxRotation:45,autoSkip:false,callback:function(v,i,t){return (i===0||i===t.length-1||i%4===0)?this.getLabelForValue(v):"";}}},y:{grid:gOpts,ticks:{...aOpts,callback:function(v){return v+"%"}}}}}
+  });
+  registerMA(ch, imor42, "rgba(192,57,43,.55)");
+}
+
+// ── CHART: CORRIENTE ──────────────────────────────────────────────────────────
+{
+  const ch = new Chart(document.getElementById("chartCorriente"),{type:"line",data:{labels:dates42,datasets:[
+    {label:"Al corriente %",data:corr42,borderColor:FOREST,backgroundColor:"rgba(31,85,86,.12)",fill:true,tension:.3,borderWidth:2.5,pointRadius:1.5,order:2},
+    maDataset(corr42, "rgba(31,85,86,.55)")
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:function(ctx){return " "+ctx.parsed.y.toFixed(1)+"%";}}}},
+    scales:{x:{grid:gOpts,ticks:{...aOpts,maxRotation:45,autoSkip:false,callback:function(v,i,t){return (i===0||i===t.length-1||i%4===0)?this.getLabelForValue(v):"";}}},
+      y:{grid:gOpts,ticks:{...aOpts,callback:function(v){return v+"%"}},min:0,max:100}}}
+  });
+  registerMA(ch, corr42, "rgba(31,85,86,.55)");
+}
+
+// ── CHART: 1-14 DÍAS ──────────────────────────────────────────────────────────
+{
+  const ch = new Chart(document.getElementById("chartM114"),{type:"line",data:{labels:dates42,datasets:[
+    {label:"1-14d %",data:m114,borderColor:ORANGE,backgroundColor:"rgba(217,119,6,.12)",fill:true,tension:.3,borderWidth:2.5,pointRadius:1.5,order:2},
+    maDataset(m114, "rgba(217,119,6,.55)")
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:function(ctx){return " "+ctx.parsed.y.toFixed(1)+"%";}}}},
+    scales:{x:{grid:gOpts,ticks:{...aOpts,maxRotation:45,autoSkip:false,callback:function(v,i,t){return (i===0||i===t.length-1||i%4===0)?this.getLabelForValue(v):"";}}},
+      y:{grid:gOpts,ticks:{...aOpts,callback:function(v){return v+"%"}},min:0}}}
+  });
+  registerMA(ch, m114, "rgba(217,119,6,.55)");
+}
+
+// ── CHART: 15-29 DÍAS ─────────────────────────────────────────────────────────
+{
+  const ch = new Chart(document.getElementById("chartM1529"),{type:"line",data:{labels:dates42,datasets:[
+    {label:"15-29d %",data:m1529,borderColor:RED,backgroundColor:"rgba(192,57,43,.12)",fill:true,tension:.3,borderWidth:2.5,pointRadius:1.5,order:2},
+    maDataset(m1529, "rgba(192,57,43,.55)")
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:function(ctx){return " "+ctx.parsed.y.toFixed(1)+"%";}}}},
+    scales:{x:{grid:gOpts,ticks:{...aOpts,maxRotation:45,autoSkip:false,callback:function(v,i,t){return (i===0||i===t.length-1||i%4===0)?this.getLabelForValue(v):"";}}},
+      y:{grid:gOpts,ticks:{...aOpts,callback:function(v){return v+"%"}},min:0}}}
+  });
+  registerMA(ch, m1529, "rgba(192,57,43,.55)");
+}
+
+// ── CHART: 30-60 DÍAS ─────────────────────────────────────────────────────────
+{
+  const ch = new Chart(document.getElementById("chartM3060"),{type:"line",data:{labels:dates42,datasets:[
+    {label:"30-60d %",data:m3060,borderColor:"#b45309",backgroundColor:"rgba(180,83,9,.12)",fill:true,tension:.3,borderWidth:2.5,pointRadius:1.5,order:2},
+    maDataset(m3060, "rgba(180,83,9,.6)")
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:function(ctx){return " "+ctx.parsed.y.toFixed(1)+"%";}}}},
+    scales:{x:{grid:gOpts,ticks:{...aOpts,maxRotation:45,autoSkip:false,callback:function(v,i,t){return (i===0||i===t.length-1||i%4===0)?this.getLabelForValue(v):"";}}},
+      y:{grid:gOpts,ticks:{...aOpts,callback:function(v){return v+"%"}},min:0}}}
+  });
+  registerMA(ch, m3060, "rgba(180,83,9,.6)");
+}
+
+// ── CHART: 61-90 DÍAS ─────────────────────────────────────────────────────────
+{
+  const ch = new Chart(document.getElementById("chartM6190"),{type:"line",data:{labels:dates42,datasets:[
+    {label:"61-90d %",data:m6190,borderColor:"#7f1d1d",backgroundColor:"rgba(127,29,29,.12)",fill:true,tension:.3,borderWidth:2.5,pointRadius:1.5,order:2},
+    maDataset(m6190, "rgba(127,29,29,.6)")
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:function(ctx){return " "+ctx.parsed.y.toFixed(1)+"%";}}}},
+    scales:{x:{grid:gOpts,ticks:{...aOpts,maxRotation:45,autoSkip:false,callback:function(v,i,t){return (i===0||i===t.length-1||i%4===0)?this.getLabelForValue(v):"";}}},
+      y:{grid:gOpts,ticks:{...aOpts,callback:function(v){return v+"%"}},min:0}}}
+  });
+  registerMA(ch, m6190, "rgba(127,29,29,.6)");
+}
+
+// ── CHART: +91 DÍAS ───────────────────────────────────────────────────────────
+{
+  const ch = new Chart(document.getElementById("chartM91p"),{type:"line",data:{labels:dates42,datasets:[
+    {label:"+91d %",data:m91p,borderColor:"#4a0000",backgroundColor:"rgba(74,0,0,.12)",fill:true,tension:.3,borderWidth:2.5,pointRadius:1.5,order:2},
+    maDataset(m91p, "rgba(74,0,0,.6)")
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:function(ctx){return " "+ctx.parsed.y.toFixed(1)+"%";}}}},
+    scales:{x:{grid:gOpts,ticks:{...aOpts,maxRotation:45,autoSkip:false,callback:function(v,i,t){return (i===0||i===t.length-1||i%4===0)?this.getLabelForValue(v):"";}}},
+      y:{grid:gOpts,ticks:{...aOpts,callback:function(v){return v+"%"}},min:0}}}
+  });
+  registerMA(ch, m91p, "rgba(74,0,0,.6)");
+}
+
+// CHART 6: Vintage 100% stacked area
+var vLabels=vint.map(function(r){return r[0];});
+new Chart(document.getElementById("chartVintageStacked"),{type:"bar",data:{labels:vLabels,datasets:[
+  {label:"Al corriente",data:vint.map(function(r){return r[3];}),backgroundColor:"rgba(31,85,86,.85)",borderRadius:0},
+  {label:"1-14 días",data:vint.map(function(r){return r[4];}),backgroundColor:"rgba(240,165,0,.75)",borderRadius:0},
+  {label:"15-29 días",data:vint.map(function(r){return r[5];}),backgroundColor:"rgba(217,119,6,.8)",borderRadius:0},
+  {label:"30-60 días",data:vint.map(function(r){return r[6];}),backgroundColor:"rgba(180,83,9,.8)",borderRadius:0},
+  {label:"61-90 días",data:vint.map(function(r){return r[7];}),backgroundColor:"rgba(192,57,43,.8)",borderRadius:0},
+  {label:"+91 días",data:vint.map(function(r){return r[8];}),backgroundColor:"rgba(123,29,29,.85)",borderRadius:0}
+]},options:{responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:true,position:"bottom",labels:{boxWidth:10,font:{size:10}}}},
+  scales:{
+    x:{grid:gOpts,ticks:aOpts,stacked:true},
+    y:{grid:gOpts,stacked:true,max:100,ticks:{...aOpts,callback:function(v){return v+"%"}}}
+  }}
+});
+
+// CHART 7: Vintage IMOR
+var vImors=vint.map(function(r){return r[9];});
+var vColors=vImors.map(function(v){return v>=25?RED:v>=15?ORANGE:v>=10?"#d97706":TEAL;});
+new Chart(document.getElementById("chartVintageIMOR"),{type:"bar",data:{labels:vLabels,datasets:[
+  {label:"IMOR 30+",data:vImors,backgroundColor:vColors,borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+  scales:{x:{grid:gOpts,ticks:aOpts},y:{min:0,max:100,grid:gOpts,ticks:{...aOpts,callback:function(v){return v+"%"}}}}}
+});
+
+// CHART 7b: Vintage saldo
+var vSaldos=vint.map(function(r){return r[2];});
+var vSaldoColors=vImors.map(function(v){return v>=25?"rgba(192,57,43,.75)":v>=15?"rgba(217,119,6,.75)":v>=10?"rgba(240,165,0,.75)":"rgba(17,171,171,.75)";});
+new Chart(document.getElementById("chartVintageSaldo"),{type:"bar",data:{labels:vLabels,datasets:[
+  {label:"Saldo (M)",data:vSaldos,backgroundColor:vSaldoColors,borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+  scales:{x:{grid:gOpts,ticks:aOpts},y:{grid:gOpts,ticks:{...aOpts,callback:function(v){return "$"+v+"M"}}}}}
+});
+
+// TABLE vintages — 1-29d combinado
+(function(){
+  var tb=document.getElementById("vintTable");
+  if(!tb) return;
+  var rows=vint.map(function(r){
+    var imor=r[9];
+    var m129=+(r[4]+r[5]).toFixed(1);
+    var bc=imor>=25?"red":imor>=15?"orange":imor>=10?"amber":"green";
+    var cs="padding:7px 6px";
+    return "<tr>"
+      +"<td style='"+cs+";text-align:left;font-weight:700;color:var(--navy)'>"+r[0]+"</td>"
+      +"<td style='"+cs+"'>"+r[1].toLocaleString()+"</td>"
+      +"<td style='"+cs+"'>$"+r[2].toFixed(1)+"M</td>"
+      +"<td style='"+cs+"'>"+r[3].toFixed(1)+"%</td>"
+      +"<td style='"+cs+"'>"+m129.toFixed(1)+"%</td>"
+      +"<td style='"+cs+"'>"+r[6].toFixed(1)+"%</td>"
+      +"<td style='"+cs+"'>"+r[7].toFixed(1)+"%</td>"
+      +"<td style='"+cs+"'>"+r[8].toFixed(1)+"%</td>"
+      +"<td style='"+cs+"'><span class='badge "+bc+"'>"+imor.toFixed(1)+"%</span></td>"
+      +"</tr>";
+  });
+  tb.innerHTML=rows.join("");
+})();
+
+
+// ── AFV overlay en charts de mora temprana (AFV_T lo refresca el script semanal) ──
+const AFV_T={"lbls": ["10-may", "17-may", "24-may", "31-may", "7-jun"], "corr": [95.1, 100.0, 82.1, 91.8, 75.5], "m114": [4.9, 0, 17.9, 8.2, 24.5], "m1529": [0, 0, 0, 0, 0], "m3060": [0, 0, 0, 0, 0], "m6190": [0, 0, 0, 0, 0], "m91p": [0, 0, 0, 0, 0], "imor": [0, 0, 0, 0, 0]};
+(function(){
+  const map={chartCorriente:'corr',chartMoraTemp:'mt',chartM114:'m114',chartM1529:'m1529',
+             chartM3060:'m3060',chartM6190:'m6190',chartM91p:'m91p',chartIMOR:'imor'};
+  function aligned(vals){
+    const arr=new Array(dates42.length).fill(null);
+    AFV_T.lbls.forEach((lbl,k)=>{
+      for(let i=dates42.length-1;i>=0;i--){ if(dates42[i]===lbl){arr[i]=vals[k];break;} }
+    });
+    return arr;
+  }
+  // tono claro del color principal de cada bucket
+  const afvCol={chartCorriente:'#9ed3cd',chartMoraTemp:'#9ed3cd',chartM114:'#f0b35e',chartM1529:'#e58a7f',
+                chartM3060:'#e0954d',chartM6190:'#c46a6a',chartM91p:'#a05252',chartIMOR:'#e58a7f'};
+  for(const id in map){
+    const ch=Chart.getChart(id); if(!ch) continue;
+    const vals = map[id]==='mt' ? AFV_T.m114.map((v,i)=>+(v+AFV_T.m1529[i]).toFixed(1)) : AFV_T[map[id]];
+    ch.data.datasets.push({label:'AFV',data:aligned(vals),borderColor:afvCol[id],backgroundColor:afvCol[id],
+      borderWidth:2,pointRadius:3.5,pointStyle:'rectRot',tension:.3,fill:false,spanGaps:false,order:1,_isAFV:true});
+    ch.options.plugins.legend={display:true,position:'bottom',labels:{boxWidth:10,font:{size:10}}};
+    if(id==='chartCorriente'){if(ch.options.scales.y.max<100)ch.options.scales.y.max=100;ch.options.scales.y.min=0;}
+    ch.update();
+  }
+})();
+
+// Scrollspy
+var navLinks=document.querySelectorAll("nav a");
+var sections=document.querySelectorAll("section[id]");
+var obs=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){
+      navLinks.forEach(function(a){a.classList.remove("active");});
+      var a=document.querySelector('nav a[href="#'+e.target.id+'"]');
+      if(a) a.classList.add("active");
+    }
+  });
+},{threshold:.3,rootMargin:"-56px 0px 0px 0px"});
+sections.forEach(function(s){obs.observe(s);});
+</script>
+
+</main>
+<script>
+window.addEventListener('beforeprint', function(){
+  if(window.Chart && Chart.instances){
+    Object.values(Chart.instances).forEach(function(c){ try{c.resize();}catch(e){} });
+  }
+});
+window.addEventListener('afterprint', function(){
+  if(window.Chart && Chart.instances){
+    Object.values(Chart.instances).forEach(function(c){ try{c.resize();}catch(e){} });
+  }
+});
+</script>
+</body>
+</html>
