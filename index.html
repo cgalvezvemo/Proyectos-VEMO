@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyectos VEMO</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f1923; color: #e0e0e0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  h1 { font-size: 1.4rem; font-weight: 600; color: #11ABAB; margin-bottom: 0.4rem; letter-spacing: 1px; text-transform: uppercase; }
+  p.sub { font-size: 0.8rem; color: #666; margin-bottom: 2.5rem; }
+  .cards { display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
+  .card { background: #1a2533; border: 1px solid #2a3a4a; border-radius: 12px; padding: 2rem 2.5rem; text-align: center; text-decoration: none; color: inherit; transition: border-color 0.2s, transform 0.2s; min-width: 220px; }
+  .card:hover { border-color: #11ABAB; transform: translateY(-3px); }
+  .card .icon { font-size: 2.2rem; margin-bottom: 0.8rem; }
+  .card .title { font-size: 1rem; font-weight: 600; color: #e0e0e0; margin-bottom: 0.4rem; }
+  .card .desc { font-size: 0.78rem; color: #888; }
+</style>
+</head>
+<body>
+  <h1>Proyectos VEMO</h1>
+  <p class="sub">Dashboards de cartera · Promecap</p>
+  <div class="cards">
+    <a class="card" href="Reporte_Cartera_LTO_v2_12jun.html">
+      <div class="icon">📊</div>
+      <div class="title">Reporte Cartera LTO</div>
+      <div class="desc">KPIs, mora temprana, tren semanal</div>
+    </a>
+    <a class="card" href="Vintages_Semanales_LTO.html">
+      <div class="icon">📈</div>
+      <div class="title">Vintages Semanales</div>
+      <div class="desc">Cosechas, FPD, Straight Rollers</div>
+    </a>
+  </div>
+</body>
+</html>
