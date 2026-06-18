@@ -353,6 +353,10 @@ footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-a
 
       
 
+      
+
+      
+
       <article class="tk-card" data-week="2026-06-14">
         <div class="tk-head">
           <div class="tk-date">Corte al 14-jun-2026</div>
@@ -918,69 +922,4 @@ new Chart(document.getElementById("chartVintageSaldo"),{type:"bar",data:{labels:
       +"<td style='"+cs+"'>$"+r[2].toFixed(1)+"M</td>"
       +"<td style='"+cs+"'>"+r[3].toFixed(1)+"%</td>"
       +"<td style='"+cs+"'>"+m129.toFixed(1)+"%</td>"
-      +"<td style='"+cs+"'>"+r[6].toFixed(1)+"%</td>"
-      +"<td style='"+cs+"'>"+r[7].toFixed(1)+"%</td>"
-      +"<td style='"+cs+"'>"+r[8].toFixed(1)+"%</td>"
-      +"<td style='"+cs+"'><span class='badge "+bc+"'>"+imor.toFixed(1)+"%</span></td>"
-      +"</tr>";
-  });
-  tb.innerHTML=rows.join("");
-})();
-
-
-// ── AFV overlay en charts de mora temprana (AFV_T lo refresca el script semanal) ──
-const AFV_T={"lbls": ["10-may", "17-may", "24-may", "31-may", "7-jun"], "corr": [95.1, 100.0, 82.1, 91.8, 75.5], "m114": [4.9, 0, 17.9, 8.2, 24.5], "m1529": [0, 0, 0, 0, 0], "m3060": [0, 0, 0, 0, 0], "m6190": [0, 0, 0, 0, 0], "m91p": [0, 0, 0, 0, 0], "imor": [0, 0, 0, 0, 0]};
-(function(){
-  const map={chartCorriente:'corr',chartMoraTemp:'mt',chartM114:'m114',chartM1529:'m1529',
-             chartM3060:'m3060',chartM6190:'m6190',chartM91p:'m91p',chartIMOR:'imor'};
-  function aligned(vals){
-    const arr=new Array(dates42.length).fill(null);
-    AFV_T.lbls.forEach((lbl,k)=>{
-      for(let i=dates42.length-1;i>=0;i--){ if(dates42[i]===lbl){arr[i]=vals[k];break;} }
-    });
-    return arr;
-  }
-  // tono claro del color principal de cada bucket
-  const afvCol={chartCorriente:'#9ed3cd',chartMoraTemp:'#9ed3cd',chartM114:'#f0b35e',chartM1529:'#e58a7f',
-                chartM3060:'#e0954d',chartM6190:'#c46a6a',chartM91p:'#a05252',chartIMOR:'#e58a7f'};
-  for(const id in map){
-    const ch=Chart.getChart(id); if(!ch) continue;
-    const vals = map[id]==='mt' ? AFV_T.m114.map((v,i)=>+(v+AFV_T.m1529[i]).toFixed(1)) : AFV_T[map[id]];
-    ch.data.datasets.push({label:'AFV',data:aligned(vals),borderColor:afvCol[id],backgroundColor:afvCol[id],
-      borderWidth:2,pointRadius:3.5,pointStyle:'rectRot',tension:.3,fill:false,spanGaps:false,order:1,_isAFV:true});
-    ch.options.plugins.legend={display:true,position:'bottom',labels:{boxWidth:10,font:{size:10}}};
-    if(id==='chartCorriente'){if(ch.options.scales.y.max<100)ch.options.scales.y.max=100;ch.options.scales.y.min=0;}
-    ch.update();
-  }
-})();
-
-// Scrollspy
-var navLinks=document.querySelectorAll("nav a");
-var sections=document.querySelectorAll("section[id]");
-var obs=new IntersectionObserver(function(entries){
-  entries.forEach(function(e){
-    if(e.isIntersecting){
-      navLinks.forEach(function(a){a.classList.remove("active");});
-      var a=document.querySelector('nav a[href="#'+e.target.id+'"]');
-      if(a) a.classList.add("active");
-    }
-  });
-},{threshold:.3,rootMargin:"-56px 0px 0px 0px"});
-sections.forEach(function(s){obs.observe(s);});
-</script>
-
-</main>
-<script>
-window.addEventListener('beforeprint', function(){
-  if(window.Chart && Chart.instances){
-    Object.values(Chart.instances).forEach(function(c){ try{c.resize();}catch(e){} });
-  }
-});
-window.addEventListener('afterprint', function(){
-  if(window.Chart && Chart.instances){
-    Object.values(Chart.instances).forEach(function(c){ try{c.resize();}catch(e){} });
-  }
-});
-</script>
-</body>
-</html>
+      +"<td style='"+cs+"'>"+r[6].toFixed(1
