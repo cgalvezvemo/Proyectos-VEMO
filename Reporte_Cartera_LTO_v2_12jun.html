@@ -291,7 +291,7 @@ footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-a
 
 <!-- HERO -->
 <section class="hero" id="resumen">
-  <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.75rem">VEMO · LTO PORTFOLIO · MAYO 2025 – MAYO 2026</div>
+  <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.75rem">VEMO · LTO PORTFOLIO · MAYO 2025 – JUNIO 2026</div>
   <h1>Cartera Semanal <span>LTO</span></h1>
   <p class="tagline">Análisis de mora temprana, tren de cartera, matrices de transición WAS/IS y evolución de vintages · Mayo 2025 – Mayo 2026</p>
   <div class="hero-kpis">
@@ -956,37 +956,3 @@ const AFV_T={"lbls": ["10-may", "17-may", "24-may", "31-may", "7-jun", "14-jun",
       borderWidth:2,pointRadius:3.5,pointStyle:'rectRot',tension:.3,fill:false,spanGaps:false,order:1,_isAFV:true});
     ch.options.plugins.legend={display:true,position:'bottom',labels:{boxWidth:10,font:{size:10}}};
     if(id==='chartCorriente'){if(ch.options.scales.y.max<100)ch.options.scales.y.max=100;ch.options.scales.y.min=0;}
-    ch.update();
-  }
-})();
-
-// Scrollspy
-var navLinks=document.querySelectorAll("nav a");
-var sections=document.querySelectorAll("section[id]");
-var obs=new IntersectionObserver(function(entries){
-  entries.forEach(function(e){
-    if(e.isIntersecting){
-      navLinks.forEach(function(a){a.classList.remove("active");});
-      var a=document.querySelector('nav a[href="#'+e.target.id+'"]');
-      if(a) a.classList.add("active");
-    }
-  });
-},{threshold:.3,rootMargin:"-56px 0px 0px 0px"});
-sections.forEach(function(s){obs.observe(s);});
-</script>
-
-</main>
-<script>
-window.addEventListener('beforeprint', function(){
-  if(window.Chart && Chart.instances){
-    Object.values(Chart.instances).forEach(function(c){ try{c.resize();}catch(e){} });
-  }
-});
-window.addEventListener('afterprint', function(){
-  if(window.Chart && Chart.instances){
-    Object.values(Chart.instances).forEach(function(c){ try{c.resize();}catch(e){} });
-  }
-});
-</script>
-</body>
-</html>
