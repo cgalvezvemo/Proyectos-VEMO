@@ -363,6 +363,18 @@ footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-a
 
       
 
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
       <article class="tk-card" data-week="2026-06-21">
         <div class="tk-head">
           <div class="tk-date">Corte al 21-jun-2026</div>
@@ -477,7 +489,7 @@ footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-a
 <!-- TREN -->
 <section class="section" id="tren">
   <div class="section-label">Tren de cartera <span style="font-size:10px;font-weight:500;opacity:.7">01 · Evolución histórica</span></div>
-  <p class="subtitle">Mayo 2025 – Mayo 2026 · 42 cortes · MXN Millones</p>
+  <p class="subtitle">Mayo 2025 – Mayo 2026 · 49 cortes · MXN Millones</p>
   <div class="alert amber"><strong>Punto de inflexión — Octubre 2025:</strong> La mora total superó el 50% por primera vez. El bucket corriente colapsó de 65% a 44% en un mes y no se ha recuperado.</div>
   <div class="chart-grid one" style="margin-bottom:1.5rem">
     <div class="chart-box">
@@ -960,3 +972,9 @@ const AFV_T={"lbls": ["10-may", "17-may", "24-may", "31-may", "7-jun", "14-jun",
       borderWidth:2,pointRadius:3.5,pointStyle:'rectRot',tension:.3,fill:false,spanGaps:false,order:1,_isAFV:true});
     ch.options.plugins.legend={display:true,position:'bottom',labels:{boxWidth:10,font:{size:10}}};
     if(id==='chartCorriente'){if(ch.options.scales.y.max<100)ch.options.scales.y.max=100;ch.options.scales.y.min=0;}
+    ch.update();
+  }
+})();
+</script>
+</body>
+</html>
