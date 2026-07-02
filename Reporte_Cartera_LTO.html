@@ -298,7 +298,7 @@ footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-a
     <div class="hero-kpi"><div class="v" style="color:var(--ice)">$1,146 M</div><div class="l">Cartera total 28-jun-26</div><div class="s">+64% vs may-25 ($698M)</div></div>
     <div class="hero-kpi"><div class="v" style="color:#FDA4AF">51.7%</div><div class="l">Mora total 28-jun-26</div><div class="s">vs 26.0% en may-25 (+25.7pp)</div></div>
     <div class="hero-kpi"><div class="v" style="color:#FCD34D">20.4%</div><div class="l">IMOR 30+ días</div><div class="s">vs 7.6% en may-25 (+12.8pp)</div></div>
-    <div class="hero-kpi"><div class="v" style="color:#6EE7B7">?</div><div class="l">Contratos activos</div><div class="s">? clientes únicos · +64% vs may-25</div></div>
+    <div class="hero-kpi"><div class="v" style="color:#6EE7B7">3,954</div><div class="l">Contratos activos</div><div class="s">3,552 clientes únicos · +64% vs may-25</div></div>
   </div>
 
   <!-- Evolución semanal por bucket -->
@@ -972,7 +972,7 @@ new Chart(document.getElementById("chartVintageSaldo"),{type:"bar",data:{labels:
 
 
 // ── AFV overlay en charts de mora temprana (AFV_T lo refresca el script semanal) ──
-const AFV_T={"lbls": ["10-may", "17-may", "24-may", "31-may", "7-jun", "14-jun", "21-jun"], "corr": [95.1, 100.0, 82.1, 91.8, 75.5, 69.9, 78.6], "m114": [4.9, 0, 17.9, 8.2, 24.5, 28.4, 18.9], "m1529": [0, 0, 0, 0, 0, 1.7, 2.6], "m3060": [0, 0, 0, 0, 0, 0, 0], "m6190": [0, 0, 0, 0, 0, 0, 0], "m91p": [0, 0, 0, 0, 0, 0, 0], "imor": [0, 0, 0, 0, 0, 0, 0]};
+const AFV_T={"lbls": ["10-may", "17-may", "24-may", "31-may", "7-jun", "14-jun", "21-jun", "28-jun"], "corr": [95.1, 100.0, 82.1, 91.8, 75.5, 69.9, 78.6, 80.7], "m114": [4.9, 0, 17.9, 8.2, 24.5, 28.4, 18.9, 14.2], "m1529": [0, 0, 0, 0, 0, 1.7, 2.6, 4.2], "m3060": [0, 0, 0, 0, 0, 0, 0, 0.9], "m6190": [0, 0, 0, 0, 0, 0, 0, 0.0], "m91p": [0, 0, 0, 0, 0, 0, 0, 0.0], "imor": [0, 0, 0, 0, 0, 0, 0, 0.9]};
 (function(){
   const map={chartCorriente:'corr',chartMoraTemp:'mt',chartM114:'m114',chartM1529:'m1529',
              chartM3060:'m3060',chartM6190:'m6190',chartM91p:'m91p',chartIMOR:'imor'};
