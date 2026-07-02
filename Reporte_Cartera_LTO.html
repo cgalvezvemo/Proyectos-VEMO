@@ -375,8 +375,6 @@ footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-a
 
       
 
-      
-
       <article class="tk-card" data-week="2026-06-28">
         <div class="tk-head">
           <div class="tk-date">Corte al 28-jun-2026</div>
@@ -684,7 +682,6 @@ footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-a
 <script>
 // DATA
 const dates42=["30-may","10-jun","17-jun","24-jun","30-jun","8-jul","15-jul","22-jul","29-jul","31-jul","12-ago","19-ago","31-ago","9-sep","17-sep","23-sep","29-sep","30-sep","7-oct","14-oct","21-oct","28-oct","31-oct","4-nov","11-nov","18-nov","30-nov","24-dic","31-dic","20-ene","28-ene","31-ene","17-feb","24-feb","28-feb","10-mar","24-mar","31-mar","16-abr","20-abr","28-abr","30-abr","10-may","17-may","24-may","31-may","7-jun","14-jun","21-jun","28-jun"];
-const AFV_T={"lbls": ["10-may", "17-may", "24-may", "31-may", "7-jun", "14-jun", "21-jun"], "corr": [95.1, 100.0, 82.1, 91.8, 75.5, 69.9, 78.6], "m114": [4.9, 0, 17.9, 8.2, 24.5, 28.4, 18.9], "m1529": [0, 0, 0, 0, 0, 1.7, 2.6], "m3060": [0, 0, 0, 0, 0, 0, 0], "m6190": [0, 0, 0, 0, 0, 0, 0], "m91p": [0, 0, 0, 0, 0, 0, 0], "imor": [0, 0, 0, 0, 0, 0, 0]};
 const total42=[697.8,695.0,702.2,711.4,742.8,742.5,746.5,761.0,761.5,791.3,794.1,796.1,832.3,836.0,844.2,844.6,833.4,874.4,875.8,861.5,892.6,909.3,917.6,892.2,920.9,935.6,955.7,985.9,986.1,1015.5,1016.7,1000.4,1018.8,1033.7,1039.1,1051.1,1051.0,1062.3,1075.0,1091.8,1089.2,1093.6,1092.6,1085.0,1098.1,1108.8,1107.7,1105.0,1118.9,1145.6];
 const corr42=[74.0,75.1,74.8,75.3,75.9,74.1,72.4,71.7,72.2,76.9,68.7,67.4,66.5,64.9,65.3,62.5,63.7,65.7,62.6,60.9,59.8,48.1,44.7,63.2,44.4,60.2,61.9,58.3,60.6,49.5,48.9,51.6,46.7,53.1,51.9,52.2,51.8,55.7,46.2,45.3,45.7,53.8,47.3,47.0,47.7,47.0,38.2,38.2,47.0,48.3];
 const m114=[14.5,13.4,13.5,12.8,12.7,14.6,14.9,15.0,13.9,10.8,15.6,16.3,15.7,15.9,15.0,17.3,16.4,15.6,18.0,18.4,18.9,30.7,33.8,16.5,33.7,18.7,18.4,22.5,19.7,24.5,24.2,22.6,23.6,18.8,20.3,19.0,18.7,17.6,24.1,23.8,23.0,18.8,21.6,21.5,21.7,23.4,31.3,30.5,23.5,22.5];
@@ -927,6 +924,76 @@ new Chart(document.getElementById("chartVintageStacked"),{type:"bar",data:{label
   plugins:{legend:{display:true,position:"bottom",labels:{boxWidth:10,font:{size:10}}}},
   scales:{
     x:{grid:gOpts,ticks:aOpts,stacked:true},
+    y:{grid:gOpts,stacked:true,max:100,ticks:{...aOpts,callback:function(v){return v+"%"}}}
+  }}
+});
+
+// CHART 7: Vintage IMOR
+var vImors=vint.map(function(r){return r[9];});
+var vColors=vImors.map(function(v){return v>=25?RED:v>=15?ORANGE:v>=10?"#d97706":TEAL;});
+new Chart(document.getElementById("chartVintageIMOR"),{type:"bar",data:{labels:vLabels,datasets:[
+  {label:"IMOR 30+",data:vImors,backgroundColor:vColors,borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+  scales:{x:{grid:gOpts,ticks:aOpts},y:{min:0,max:100,grid:gOpts,ticks:{...aOpts,callback:function(v){return v+"%"}}}}}
+});
+
+// CHART 7b: Vintage saldo
+var vSaldos=vint.map(function(r){return r[2];});
+var vSaldoColors=vImors.map(function(v){return v>=25?"rgba(192,57,43,.75)":v>=15?"rgba(217,119,6,.75)":v>=10?"rgba(240,165,0,.75)":"rgba(17,171,171,.75)";});
+new Chart(document.getElementById("chartVintageSaldo"),{type:"bar",data:{labels:vLabels,datasets:[
+  {label:"Saldo (M)",data:vSaldos,backgroundColor:vSaldoColors,borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+  scales:{x:{grid:gOpts,ticks:aOpts},y:{grid:gOpts,ticks:{...aOpts,callback:function(v){return "$"+v+"M"}}}}}
+});
+
+// TABLE vintages — 1-29d combinado
+(function(){
+  var tb=document.getElementById("vintTable");
+  if(!tb) return;
+  var rows=vint.map(function(r){
+    var imor=r[9];
+    var m129=+(r[4]+r[5]).toFixed(1);
+    var bc=imor>=25?"red":imor>=15?"orange":imor>=10?"amber":"green";
+    var cs="padding:7px 6px";
+    return "<tr>"
+      +"<td style='"+cs+";text-align:left;font-weight:700;color:var(--navy)'>"+r[0]+"</td>"
+      +"<td style='"+cs+"'>"+r[1].toLocaleString()+"</td>"
+      +"<td style='"+cs+"'>$"+r[2].toFixed(1)+"M</td>"
+      +"<td style='"+cs+"'>"+r[3].toFixed(1)+"%</td>"
+      +"<td style='"+cs+"'>"+m129.toFixed(1)+"%</td>"
+      +"<td style='"+cs+"'>"+r[6].toFixed(1)+"%</td>"
+      +"<td style='"+cs+"'>"+r[7].toFixed(1)+"%</td>"
+      +"<td style='"+cs+"'>"+r[8].toFixed(1)+"%</td>"
+      +"<td style='"+cs+"'><span class='badge "+bc+"'>"+imor.toFixed(1)+"%</span></td>"
+      +"</tr>";
+  });
+  tb.innerHTML=rows.join("");
+})();
+
+
+// ── AFV overlay en charts de mora temprana (AFV_T lo refresca el script semanal) ──
+const AFV_T={"lbls": ["10-may", "17-may", "24-may", "31-may", "7-jun", "14-jun", "21-jun"], "corr": [95.1, 100.0, 82.1, 91.8, 75.5, 69.9, 78.6], "m114": [4.9, 0, 17.9, 8.2, 24.5, 28.4, 18.9], "m1529": [0, 0, 0, 0, 0, 1.7, 2.6], "m3060": [0, 0, 0, 0, 0, 0, 0], "m6190": [0, 0, 0, 0, 0, 0, 0], "m91p": [0, 0, 0, 0, 0, 0, 0], "imor": [0, 0, 0, 0, 0, 0, 0]};
+(function(){
+  const map={chartCorriente:'corr',chartMoraTemp:'mt',chartM114:'m114',chartM1529:'m1529',
+             chartM3060:'m3060',chartM6190:'m6190',chartM91p:'m91p',chartIMOR:'imor'};
+  function aligned(vals){
+    const arr=new Array(dates42.length).fill(null);
+    AFV_T.lbls.forEach((lbl,k)=>{
+      for(let i=dates42.length-1;i>=0;i--){ if(dates42[i]===lbl){arr[i]=vals[k];break;} }
+    });
+    return arr;
+  }
+  const afvCol={chartCorriente:'#9ed3cd',chartMoraTemp:'#9ed3cd',chartM114:'#f0b35e',chartM1529:'#e58a7f',
+                chartM3060:'#e0954d',chartM6190:'#c46a6a',chartM91p:'#a05252',chartIMOR:'#e58a7f'};
+  for(const id in map){
+    const ch=Chart.getChart(id); if(!ch) continue;
+    const vals = map[id]==='mt' ? AFV_T.m114.map((v,i)=>+(v+AFV_T.m1529[i]).toFixed(1)) : AFV_T[map[id]];
+    ch.data.datasets.push({label:'AFV',data:aligned(vals),borderColor:afvCol[id],backgroundColor:afvCol[id],
+      borderWidth:2,pointRadius:3.5,pointStyle:'rectRot',tension:.3,fill:false,spanGaps:false,order:1,_isAFV:true});
+    ch.options.plugins.legend={display:true,position:'bottom',labels:{boxWidth:10,font:{size:10}}};
+    if(id==='chartCorriente'){if(ch.options.scales.y.max<100)ch.options.scales.y.max=100;ch.options.scales.y.min=0;}
+    ch.update();
+  }
 })();
 </script>
 </body>
