@@ -721,7 +721,7 @@ footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-a
       <div id="cmpSnapAFV" style="overflow-x:auto"></div>
     </div>
   </div>
-  <p style="font-size:10px;color:#8a9a9a;margin-top:.4rem">Vencido = exigible no pagado al corte: capital + inter&eacute;s ordinario + inter&eacute;s de seguro + comisiones + moratorio (sin IVA) &middot; fuente FILTRO del corte m&aacute;s reciente</p>
+  <p style="font-size:10px;color:#8a9a9a;margin-top:.4rem">Capital total por contrato (col. AF del FILTRO) al corte m&aacute;s reciente &middot; LTO + AFV &asymp; cartera total del resumen (dif &lt;0.3% por base de agregaci&oacute;n del RESUMEN)</p>
 </section>
 
 <!-- VINTAGES -->
@@ -1140,11 +1140,11 @@ function renderSnap(seg,elId){
       <td style="text-align:left;white-space:nowrap"><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${col};margin-right:6px"></span>${lbl}</td>
       <td>${n.toLocaleString()}</td>
       <td style="min-width:110px"><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:7px;background:#eef1f1;border-radius:4px;overflow:hidden"><div style="width:${Math.min(100,pct).toFixed(1)}%;height:100%;background:${col}"></div></div><span style="min-width:38px;text-align:right">${pct.toFixed(1)}%</span></div></td>
-      <td>${fmt$(cap)}</td><td>${fmt$(pd)}</td><td>${n?fmt$(pd/n):'\u2014'}</td></tr>`;
+      <td>${fmt$(cap)}</td></tr>`;
   }
-  rows+=`<tr style="font-weight:700;border-top:2px solid var(--border)"><td style="text-align:left">Total</td><td>${totN.toLocaleString()}</td><td>100.0%</td><td>${fmt$(tot===1?0:tot)}</td><td>${fmt$(totPd)}</td><td>${totN?fmt$(totPd/totN):'\u2014'}</td></tr>`;
+  rows+=`<tr style="font-weight:700;border-top:2px solid var(--border)"><td style="text-align:left">Total</td><td>${totN.toLocaleString()}</td><td>100.0%</td><td>${fmt$(tot===1?0:tot)}</td></tr>`;
   el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="color:#6b7a8a;font-size:10px;text-transform:uppercase;letter-spacing:.03em">
-    <th style="text-align:left;padding:5px 6px">Bucket (d\u00edas)</th><th>Ctos</th><th>% capital</th><th>Capital</th><th>Vencido</th><th>Venc. prom</th></tr></thead>
+    <th style="text-align:left;padding:5px 6px">Bucket (d\u00edas)</th><th>Ctos</th><th>% capital</th><th>Capital</th></tr></thead>
     <tbody style="text-align:right">${rows}</tbody></table>`;
   el.querySelectorAll('td').forEach(td=>{td.style.padding='5px 6px';td.style.borderTop='1px solid #f0f3f3';});
 }
