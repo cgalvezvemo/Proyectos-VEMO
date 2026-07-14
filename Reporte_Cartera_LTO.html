@@ -1128,7 +1128,7 @@ const SNAP_ORDER=[['0','Al corriente','#9ed3cd'],['1 A 14','1-14','#f0b35e'],['1
  ['30 A 60','30-60','#e0954d'],['61 A 90','61-90','#c46a6a'],['91 A 120','91-120','#a05252'],
  ['121 A 150','121-150','#8d4444'],['151 A 180','151-180','#7a3a3a'],['181 A 365','181-365','#663030'],
  ['366 \u00d3 M\u00c1S','366+','#552828']];
-const fmt$=v=>'$'+Math.round(v).toLocaleString('en-US');
+const fmt$=v=>'$'+(v/1e6).toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1})+'M';
 function renderSnap(seg,elId){
   const d=CMP_SNAP[seg]||{}; const el=document.getElementById(elId); if(!el) return;
   const tot=Object.values(d).reduce((t,v)=>t+v[1],0)||1;
