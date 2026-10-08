@@ -285,6 +285,7 @@ footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-a
   <a href="#tren">Tren</a>
   <a href="#mora-temprana">Mora temprana</a>
   <a href="#comparativa">AFV / AFV+</a>
+  <a href="#afn">AFN</a>
   <a href="#vintages">Vintages</a>
   <span class="nav-badge">30-sep-26</span>
   <span class="nav-conf">Confidencial</span>
@@ -350,6 +351,8 @@ footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-a
   <div class="section-label">Takeaways semanales <span style="font-size:10px;font-weight:500;opacity:.7">Lectura ejecutiva · VEMO</span></div>
   <p class="subtitle">Cambios relevantes corte vs. corte · más recientes arriba</p>
   <div class="tk-grid">
+      
+
       
 
       
@@ -981,8 +984,8 @@ footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-a
 
 <!-- COMPARATIVA LTO vs AFV -->
 <section class="section" id="comparativa">
-  <div class="section-label">Comparativa LTO vs AFV <span style="font-size:10px;font-weight:500;opacity:.7">02b &middot; Benchmark interno</span></div>
-  <p class="subtitle">Distribuci&oacute;n por bucket al cierre y evoluci&oacute;n de las &uacute;ltimas semanas &middot; % del capital de cada cartera &middot; incluye <strong>AFV+</strong> (cosechas AFV desde el 12-jul-26)</p>
+  <div class="section-label">Comparativa por cartera &mdash; Legacy AF &middot; AFV &middot; AFN <span style="font-size:10px;font-weight:500;opacity:.7">02b &middot; Benchmark interno</span></div>
+  <p class="subtitle">Distribuci&oacute;n por bucket al cierre y evoluci&oacute;n de las &uacute;ltimas semanas &middot; % del capital de cada cartera &middot; tres tracks independientes: <strong>Legacy AF</strong> (cartera total &minus; AFV &minus; AFN), <strong>AFV</strong> (pricing; incluye <strong>AFV+</strong>, cosechas desde el 12-jul-26) y <strong>AFN</strong> (pol&iacute;ticas nuevas, contratos *AFN desde el 2-sep-26)</p>
   <div class="chart-grid">
     <div class="chart-box">
       <h4 id="cmpBkTitle">Buckets al cierre</h4>
@@ -1003,7 +1006,7 @@ footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-a
   </div>
   <div class="chart-grid" style="margin-top:1rem">
     <div class="chart-box">
-      <h4 id="snapTitleL">Bucket snapshot &mdash; LTO</h4>
+      <h4 id="snapTitleL">Bucket snapshot &mdash; Legacy AF</h4>
       <div id="cmpSnapLTO" style="overflow-x:auto"></div>
     </div>
     <div class="chart-box">
@@ -1038,7 +1041,34 @@ footer{background:var(--forest);color:rgba(255,255,255,.6);font-size:10px;text-a
     </div>
     <p style="font-size:10px;color:#8a9a9a;margin-top:.5rem;line-height:1.6"><strong>C&oacute;mo leer:</strong> AFV+ tiene pocas semanas en libros, as&iacute; que su mora <em>en niveles</em> no es comparable contra AFV ni contra LTO, que ya maduraron &mdash; el snapshot y los KPIs son estado, no desempe&ntilde;o. La comparaci&oacute;n v&aacute;lida es la de la derecha: cada curva es el % del capital de la cosecha con atraso, medido a las <strong>mismas semanas en libros</strong> (promedio ponderado por capital de todas las observaciones semanales disponibles a esa edad; cosechas semanales del segmento AFV). Ejemplo de lectura: en la semana 2 en libros, AFV+ compara contra donde estaba el AFV previo tambi&eacute;n en su semana 2, no contra el AFV de hoy.</p>
   </div>
-  <p style="font-size:10px;color:#8a9a9a;margin-top:.4rem">Capital total por contrato (col. AF del FILTRO) al corte m&aacute;s reciente &middot; LTO + AFV &asymp; cartera total del resumen (dif &lt;0.3% por base de agregaci&oacute;n del RESUMEN)</p>
+  <!-- AFN : politicas nuevas (contratos *AFN desde 2-sep-26) - track independiente -->
+  <div id="afn" style="margin-top:1.75rem;border-top:2px solid var(--border2);padding-top:1.25rem">
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:.3rem">
+      <h2 style="font-size:17px">AFN &mdash; cartera con pol&iacute;ticas nuevas</h2>
+      <span class="badge" style="font-size:10px;background:#ece6f7;color:#5b3f9a">track independiente</span>
+    </div>
+    <p class="subtitle" style="margin-bottom:.9rem">Tipo de operaci&oacute;n <em>ARRENDAMIENTO FINANCIERO LTO</em>, contratos con sufijo <strong>AFN</strong>, colocados desde el 2-sep-26 con las pol&iacute;ticas nuevas. Sustituye la originaci&oacute;n de AFV (&uacute;ltimo AFV: 10-sep-26) &middot; <strong>no</strong> vive dentro de AFV ni de Legacy: es un tercer track.</p>
+    <div class="alert" id="afnAlert" style="display:none"></div>
+    <div class="kpi-grid" id="afnKpis" style="margin-bottom:1rem"></div>
+    <div class="chart-grid">
+      <div class="chart-box">
+        <h4 id="snapTitleN">Bucket snapshot &mdash; AFN</h4>
+        <div id="cmpSnapAFN" style="overflow-x:auto"></div>
+      </div>
+      <div class="chart-box">
+        <h4>Mora a la misma edad &mdash; AFN vs AFV+ vs AFV previo vs AF legacy</h4>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px">
+          <button onclick="setAfnSev('a1',this)" class="ma-btn active">1+ d</button>
+          <button onclick="setAfnSev('a7',this)" class="ma-btn">7+ d</button>
+          <button onclick="setAfnSev('a15',this)" class="ma-btn">15+ d</button>
+          <button onclick="setAfnSev('a30',this)" class="ma-btn">30+ d</button>
+        </div>
+        <div class="chart-wrap"><canvas id="chartAfnAge"></canvas></div>
+      </div>
+    </div>
+    <p style="font-size:10px;color:#8a9a9a;margin-top:.5rem;line-height:1.6"><strong>C&oacute;mo leer:</strong> AFN lleva muy pocas semanas en libros; su mora en niveles (KPIs y snapshot) es estado, no desempe&ntilde;o. La comparaci&oacute;n v&aacute;lida es la curva: % del capital de la cosecha con atraso, medido a las <strong>mismas semanas en libros</strong> para cada track (promedio ponderado por capital, s&oacute;lo cortes de domingo: los cierres de mes caen entre semana e inflan la mora de 1+ d&iacute;a). AF legacy = cosechas AF originadas en 2026. Ejemplo: en la semana 3, AFN se compara contra d&oacute;nde estaban AFV+ y AFV previo tambi&eacute;n en su semana 3.</p>
+  </div>
+  <p style="font-size:10px;color:#8a9a9a;margin-top:.4rem">Capital total por contrato (col. AF del FILTRO) al corte m&aacute;s reciente &middot; Legacy AF + AFV + AFN &asymp; cartera total del resumen (dif &lt;0.3% por base de agregaci&oacute;n del RESUMEN)</p>
 </section>
 
 <!-- VINTAGES -->
@@ -1383,6 +1413,7 @@ new Chart(document.getElementById("chartVintageSaldo"),{type:"bar",data:{labels:
 // ── AFV overlay en charts de mora temprana (AFV_T lo refresca el script semanal) ──
 const AFV_T={"lbls": ["10-may", "17-may", "24-may", "31-may", "7-jun", "14-jun", "21-jun", "28-jun", "30-jun", "5-jul", "12-jul", "19-jul", "26-jul", "31-jul", "10-ago", "16-ago", "23-ago", "31-ago", "6-sep", "13-sep", "20-sep", "27-sep", "30-sep"], "corr": [95.1, 100.0, 82.1, 91.8, 75.5, 69.9, 78.6, 80.7, 75.0, 78.9, 72.2, 68.5, 67.9, 69.2, 70.6, 70.9, 70.0, 72.7, 68.8, 68.6, 64.4, 62.9, 48.6], "m114": [4.9, 0, 17.9, 8.2, 24.5, 28.4, 18.9, 14.2, 18.6, 15.2, 19.8, 21.9, 21.0, 16.3, 16.2, 17.1, 17.2, 14.8, 18.1, 17.8, 20.0, 19.5, 28.5], "m1529": [0, 0, 0, 0, 0, 1.7, 2.6, 4.2, 5.4, 4.4, 5.4, 6.1, 6.5, 9.5, 8.1, 5.6, 6.0, 5.7, 6.3, 6.7, 8.1, 9.2, 14.0], "m3060": [0, 0, 0, 0, 0, 0, 0, 0.9, 1.0, 1.5, 2.6, 3.5, 4.2, 4.4, 4.3, 5.6, 5.4, 5.2, 5.4, 5.3, 5.5, 6.4, 6.7], "m6190": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.4, 0.7, 0.8, 0.9, 1.4, 1.4, 1.3, 1.3, 1.7, 1.5, 1.5], "m91p": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0.1, 0.4, 0.4, 0.5, 0.6], "imor": [0, 0, 0, 0, 0, 0, 0, 0.9, 1.0, 1.5, 2.6, 3.5, 4.6, 5.1, 5.1, 6.4, 6.9, 6.8, 6.8, 6.9, 7.5, 8.3, 8.8]};
 const AFVP_T={"lbls": ["19-jul", "26-jul", "31-jul", "9-ago", "10-ago", "16-ago", "23-ago", "31-ago", "6-sep", "13-sep", "20-sep", "27-sep", "30-sep"], "corr": [100.0, 97.9, 95.8, 92.4, 92.4, 90.2, 86.9, 87.3, 80.9, 80.3, 73.6, 71.5, 57.4], "m114": [0, 2.1, 4.2, 6.8, 6.8, 9.1, 10.7, 10.2, 14.8, 14.0, 17.5, 18.0, 27.3], "m1529": [0, 0, 0, 0.8, 0.8, 0.7, 2.1, 2.0, 3.3, 4.4, 6.6, 7.4, 11.4], "m3060": [0, 0, 0, 0, 0, 0, 0.3, 0.5, 1.0, 1.2, 2.3, 3.0, 3.7], "m6190": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2], "m91p": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "imor": [0, 0, 0, 0, 0, 0, 0.3, 0.5, 1.0, 1.2, 2.3, 3.0, 3.9]};
+const AFN_T={"lbls": ["13-sep", "20-sep", "27-sep", "30-sep"], "corr": [100.0, 100.0, 93.9, 83.2], "m114": [0, 0, 6.1, 16.8], "m1529": [0, 0, 0, 0], "m3060": [0, 0, 0, 0], "m6190": [0, 0, 0, 0], "m91p": [0, 0, 0, 0], "imor": [0, 0, 0, 0]};
 (function(){
   const map={chartCorriente:'corr',chartMoraTemp:'mt',chartM114:'m114',chartM1529:'m1529',
              chartM3060:'m3060',chartM6190:'m6190',chartM91p:'m91p',chartIMOR:'imor'};
@@ -1407,6 +1438,13 @@ const AFVP_T={"lbls": ["19-jul", "26-jul", "31-jul", "9-ago", "10-ago", "16-ago"
         borderColor:'#11ABAB',backgroundColor:'#11ABAB',borderWidth:2.4,borderDash:[5,3],
         pointRadius:4,pointStyle:'triangle',tension:.3,fill:false,spanGaps:false,order:0,_isAFVP:true});
     }
+    // AFN = producto con políticas nuevas (contratos *AFN, desde 2-sep-26) — track independiente
+    if(typeof AFN_T!=='undefined' && AFN_T.lbls && AFN_T.lbls.length){
+      const vn = map[id]==='mt' ? AFN_T.m114.map((v,i)=>+(v+AFN_T.m1529[i]).toFixed(1)) : AFN_T[map[id]];
+      ch.data.datasets.push({label:'AFN (pol\u00edticas nuevas)',data:aligned(vn,AFN_T.lbls),
+        borderColor:'#5b3f9a',backgroundColor:'#5b3f9a',borderWidth:2.4,borderDash:[2,2],
+        pointRadius:4,pointStyle:'rectRot',tension:.3,fill:false,spanGaps:false,order:0,_isAFN:true});
+    }
     ch.options.plugins.legend={display:true,position:'bottom',labels:{boxWidth:10,font:{size:10}}};
     if(id==='chartCorriente'){if(ch.options.scales.y.max<100)ch.options.scales.y.max=100;ch.options.scales.y.min=0;}
     ch.update();
@@ -1416,7 +1454,7 @@ const AFVP_T={"lbls": ["19-jul", "26-jul", "31-jul", "9-ago", "10-ago", "16-ago"
 
 <script>
 // ── Comparativa LTO vs AFV (CMP_T lo refresca el script semanal) ──
-const CMP_T={"lbls": ["10-may", "17-may", "24-may", "31-may", "7-jun", "14-jun", "21-jun", "28-jun", "30-jun", "5-jul", "12-jul", "19-jul", "26-jul", "31-jul", "10-ago", "16-ago", "23-ago", "31-ago", "6-sep", "13-sep", "20-sep", "27-sep", "30-sep"], "lto": {"corr": [47.3, 47.0, 47.7, 47.0, 38.2, 38.2, 47.0, 48.3, 52.2, 48.8, 48.1, 47.6, 47.9, 48.6, 49.5, 49.9, 49.2, 52.6, 50.6, 51.6, 51.1, 50.3, 49.4], "m114": [21.6, 21.5, 21.7, 23.4, 31.3, 30.5, 23.5, 22.5, 21.4, 22.4, 23.0, 23.4, 23.1, 22.6, 21.9, 22.3, 22.1, 20.8, 21.6, 20.9, 21.5, 20.8, 23.0], "m1529": [9.5, 9.4, 9.3, 8.3, 10.1, 10.4, 9.0, 8.6, 8.1, 8.4, 9.0, 9.1, 9.1, 9.8, 10.1, 9.1, 9.6, 8.8, 8.9, 8.7, 8.6, 8.7, 9.8], "m3060": [11.0, 11.5, 11.3, 11.0, 10.2, 10.4, 10.2, 10.1, 8.1, 9.6, 9.9, 9.9, 9.5, 10.5, 10.2, 10.8, 11.0, 10.4, 10.9, 10.9, 11.1, 11.2, 8.8], "m6190": [4.7, 4.4, 4.2, 4.5, 4.6, 4.5, 4.3, 4.4, 5.7, 4.4, 4.3, 4.5, 4.6, 4.0, 4.0, 3.9, 4.0, 3.6, 4.0, 4.0, 4.2, 4.9, 5.6], "m91p": [5.9, 6.3, 5.9, 5.8, 5.7, 6.0, 6.0, 6.0, 4.5, 6.3, 5.6, 5.5, 5.9, 4.5, 4.3, 4.1, 4.0, 3.8, 4.1, 3.9, 3.5, 4.1, 3.4]}, "afv": {"corr": [95.1, 100.0, 82.1, 91.8, 75.5, 69.9, 78.6, 80.7, 75.0, 78.9, 72.2, 68.5, 67.9, 69.2, 70.6, 70.9, 70.0, 72.7, 68.8, 68.6, 64.4, 62.9, 48.6], "m114": [4.9, 0, 17.9, 8.2, 24.5, 28.4, 18.9, 14.2, 18.6, 15.2, 19.8, 21.9, 21.0, 16.3, 16.2, 17.1, 17.2, 14.8, 18.1, 17.8, 20.0, 19.5, 28.5], "m1529": [0, 0, 0, 0, 0, 1.7, 2.6, 4.2, 5.4, 4.4, 5.4, 6.1, 6.5, 9.5, 8.1, 5.6, 6.0, 5.7, 6.3, 6.7, 8.1, 9.2, 14.0], "m3060": [0, 0, 0, 0, 0, 0.0, 0.0, 0.9, 1.0, 1.5, 2.6, 3.5, 4.2, 4.4, 4.3, 5.6, 5.4, 5.2, 5.4, 5.3, 5.5, 6.4, 6.7], "m6190": [0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4, 0.7, 0.8, 0.9, 1.4, 1.4, 1.3, 1.3, 1.7, 1.5, 1.5], "m91p": [0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, 0.4, 0.4, 0.5, 0.6]}, "afvp": {"corr": [null, null, null, null, null, null, null, null, null, null, null, 100.0, 97.9, 95.8, 92.4, 90.2, 86.9, 87.3, 80.9, 80.3, 73.6, 71.5, 57.4], "m114": [null, null, null, null, null, null, null, null, null, null, null, 0.0, 2.1, 4.2, 6.8, 9.1, 10.7, 10.2, 14.8, 14.0, 17.5, 18.0, 27.3], "m1529": [null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0, 0.0, 0.8, 0.7, 2.1, 2.0, 3.3, 4.4, 6.6, 7.4, 11.4], "m3060": [null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.5, 1.0, 1.2, 2.3, 3.0, 3.7], "m6190": [null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2], "m91p": [null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, "cierre": "30-sep-26"};
+const CMP_T={"lbls": ["10-may", "17-may", "24-may", "31-may", "7-jun", "14-jun", "21-jun", "28-jun", "30-jun", "5-jul", "12-jul", "19-jul", "26-jul", "31-jul", "10-ago", "16-ago", "23-ago", "31-ago", "6-sep", "13-sep", "20-sep", "27-sep", "30-sep"], "lto": {"corr": [47.3, 47.0, 47.7, 47.0, 38.2, 35.7, 43.8, 43.9, 48.1, 43.4, 43.1, 42.8, 42.7, 42.5, 42.1, 41.8, 40.4, 43.1, 41.8, 42.2, 42.2, 40.7, 46.3], "m114": [21.7, 21.5, 21.7, 23.4, 31.3, 30.7, 24.0, 23.7, 22.0, 23.7, 23.7, 23.8, 23.6, 24.4, 23.9, 24.3, 24.2, 23.6, 23.2, 22.9, 23.2, 22.5, 20.8], "m1529": [9.4, 9.4, 9.3, 8.3, 10.0, 11.1, 9.6, 9.3, 8.5, 9.2, 9.6, 9.7, 9.8, 9.9, 10.8, 10.4, 11.2, 10.2, 10.2, 9.8, 9.3, 9.1, 8.7], "m3060": [11.0, 11.5, 11.3, 10.9, 10.2, 11.2, 11.3, 11.4, 9.3, 11.1, 11.5, 11.4, 10.9, 12.3, 12.3, 12.7, 13.3, 12.9, 13.5, 14.0, 14.4, 14.5, 10.8], "m6190": [4.7, 4.3, 4.2, 4.5, 4.6, 4.8, 4.7, 5.0, 6.8, 5.2, 5.2, 5.6, 5.7, 5.1, 5.1, 5.0, 5.1, 4.7, 5.3, 5.4, 5.6, 7.0, 8.2], "m91p": [5.9, 6.3, 5.9, 5.9, 5.7, 6.5, 6.6, 6.9, 5.3, 7.4, 6.8, 6.7, 7.4, 5.8, 5.7, 5.7, 5.7, 5.6, 6.0, 5.7, 5.3, 6.1, 5.2]}, "afv": {"corr": [95.1, 100.0, 82.1, 91.8, 75.5, 69.9, 78.6, 80.7, 75.0, 78.9, 72.2, 68.5, 67.9, 69.2, 70.6, 70.9, 70.0, 72.7, 68.8, 68.6, 64.4, 62.9, 48.6], "m114": [4.9, 0, 17.9, 8.2, 24.5, 28.4, 18.9, 14.2, 18.6, 15.2, 19.8, 21.9, 21.0, 16.3, 16.2, 17.1, 17.2, 14.8, 18.1, 17.8, 20.0, 19.5, 28.5], "m1529": [0, 0, 0, 0, 0, 1.7, 2.6, 4.2, 5.4, 4.4, 5.4, 6.1, 6.5, 9.5, 8.1, 5.6, 6.0, 5.7, 6.3, 6.7, 8.1, 9.2, 14.0], "m3060": [0, 0, 0, 0, 0, 0.0, 0.0, 0.9, 1.0, 1.5, 2.6, 3.5, 4.2, 4.4, 4.3, 5.6, 5.4, 5.2, 5.4, 5.3, 5.5, 6.4, 6.7], "m6190": [0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4, 0.7, 0.8, 0.9, 1.4, 1.4, 1.3, 1.3, 1.7, 1.5, 1.5], "m91p": [0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.1, 0.4, 0.4, 0.5, 0.6]}, "afvp": {"corr": [null, null, null, null, null, null, null, null, null, null, null, 100.0, 97.9, 95.8, 92.4, 90.2, 86.9, 87.3, 80.9, 80.3, 73.6, 71.5, 57.4], "m114": [null, null, null, null, null, null, null, null, null, null, null, 0.0, 2.1, 4.2, 6.8, 9.1, 10.7, 10.2, 14.8, 14.0, 17.5, 18.0, 27.3], "m1529": [null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0, 0.0, 0.8, 0.7, 2.1, 2.0, 3.3, 4.4, 6.6, 7.4, 11.4], "m3060": [null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.5, 1.0, 1.2, 2.3, 3.0, 3.7], "m6190": [null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.2], "m91p": [null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, "afn": {"corr": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 100.0, 100.0, 93.9, 83.2], "m114": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0, 6.1, 16.8], "m1529": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0, 0.0, 0.0], "m3060": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0, 0.0, 0.0], "m6190": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0, 0.0, 0.0], "m91p": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0, 0.0, 0.0]}, "cierre": "30-sep-26"};
 const CMP_LBL={corr:'Al corriente',m114:'1-14 d\u00edas',m1529:'15-29 d\u00edas',m3060:'30-60 d\u00edas',m6190:'61-90 d\u00edas',m91p:'+91 d\u00edas'};
 let cmpBk='corr', chCmpEvo=null;
 (function(){
@@ -1424,14 +1462,18 @@ let cmpBk='corr', chCmpEvo=null;
   const last=k=>CMP_T.lto[k][CMP_T.lto[k].length-1]||0;
   const lastA=k=>CMP_T.afv[k][CMP_T.afv[k].length-1]||0;
   const hasP=()=>!!(CMP_T.afvp&&CMP_T.afvp.corr&&CMP_T.afvp.corr.some(v=>v!==null&&v!==undefined));
+  const hasN=()=>!!(CMP_T.afn&&CMP_T.afn.corr&&CMP_T.afn.corr.some(v=>v!==null&&v!==undefined));
+  const lastN=k=>{const a=(CMP_T.afn||{})[k]||[];for(let i=a.length-1;i>=0;i--){if(a[i]!==null&&a[i]!==undefined)return a[i];}return 0;};
   const lastP=k=>{const a=(CMP_T.afvp||{})[k]||[];for(let i=a.length-1;i>=0;i--){if(a[i]!==null&&a[i]!==undefined)return a[i];}return 0;};
   document.getElementById('cmpBkTitle').textContent='Buckets al cierre \u2014 '+CMP_T.cierre;
   new Chart(document.getElementById('chartCmpBk'),{type:'bar',
    data:{labels:cats,datasets:[
-    {label:'LTO',data:Object.keys(CMP_LBL).map(last),backgroundColor:'rgba(31,60,85,.75)',borderRadius:3},
+    {label:'Legacy AF',data:Object.keys(CMP_LBL).map(last),backgroundColor:'rgba(31,60,85,.75)',borderRadius:3},
     {label:'AFV',data:Object.keys(CMP_LBL).map(lastA),backgroundColor:'rgba(14,124,123,.8)',borderRadius:3}]
     .concat(hasP()?[{label:'AFV+ (orig. \u226512-jul)',data:Object.keys(CMP_LBL).map(lastP),
-      backgroundColor:'rgba(17,171,171,.85)',borderColor:'#0e7c7b',borderWidth:1,borderRadius:3}]:[])},
+      backgroundColor:'rgba(17,171,171,.85)',borderColor:'#0e7c7b',borderWidth:1,borderRadius:3}]:[])
+    .concat(hasN()?[{label:'AFN (pol\u00edticas nuevas)',data:Object.keys(CMP_LBL).map(lastN),
+      backgroundColor:'rgba(91,63,154,.8)',borderRadius:3}]:[])},
    options:{maintainAspectRatio:false,animation:false,
     plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}},
      tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+c.parsed.y.toFixed(1)+'% del capital'}}},
@@ -1443,16 +1485,18 @@ function renderCmpEvo(){
   if(chCmpEvo) chCmpEvo.destroy();
   chCmpEvo=new Chart(document.getElementById('chartCmpEvo'),{type:'line',
    data:{labels:CMP_T.lbls,datasets:[
-    {label:'LTO',data:CMP_T.lto[cmpBk],borderColor:'#1f3c55',backgroundColor:'#1f3c55',borderWidth:2.4,pointRadius:2.5,tension:.3,fill:false},
+    {label:'Legacy AF',data:CMP_T.lto[cmpBk],borderColor:'#1f3c55',backgroundColor:'#1f3c55',borderWidth:2.4,pointRadius:2.5,tension:.3,fill:false},
     {label:'AFV',data:CMP_T.afv[cmpBk],borderColor:'#0e7c7b',backgroundColor:'#0e7c7b',borderWidth:2.4,pointRadius:2.5,tension:.3,fill:false}]
     .concat((CMP_T.afvp&&CMP_T.afvp[cmpBk])?[{label:'AFV+ (orig. \u226512-jul)',data:CMP_T.afvp[cmpBk],
-      borderColor:'#11ABAB',backgroundColor:'#11ABAB',borderWidth:2.4,borderDash:[5,3],pointRadius:4,pointStyle:'triangle',tension:.3,fill:false}]:[])},
+      borderColor:'#11ABAB',backgroundColor:'#11ABAB',borderWidth:2.4,borderDash:[5,3],pointRadius:4,pointStyle:'triangle',tension:.3,fill:false}]:[])
+    .concat((CMP_T.afn&&CMP_T.afn[cmpBk]&&CMP_T.afn[cmpBk].some(v=>v!==null))?[{label:'AFN (pol\u00edticas nuevas)',data:CMP_T.afn[cmpBk],
+      borderColor:'#5b3f9a',backgroundColor:'#5b3f9a',borderWidth:2.4,borderDash:[2,2],pointRadius:4,pointStyle:'rectRot',tension:.3,fill:false}]:[])},
    options:{maintainAspectRatio:false,animation:false,spanGaps:false,
     plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}},
      tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+(c.parsed.y===null?'\u2014':c.parsed.y.toFixed(1)+'%')}}},
     scales:{x:{ticks:{font:{size:9}}},y:{min:0,ticks:{callback:v=>v+'%'}}}}});
 }
-const CMP_SNAP={"lto": {"1 A 14": [587, 166535860, 25576], "0": [1659, 404187310, 0], "30 A 60": [288, 84381245, 249977], "121 A 150": [46, 15022511, 695495], "61 A 90": [223, 67046109, 915676], "15 A 29": [227, 64837529, 37006], "151 A 180": [29, 8969525, 813071], "91 A 120": [67, 19461675, 482731], "181 A 365": [3, 1093455, 63966]}, "afv": {"1 A 14": [277, 108096511, 3005], "0": [460, 184126157, 0], "15 A 29": [134, 53070730, 104230], "30 A 60": [65, 25427732, 177772], "61 A 90": [14, 5634021, 129701], "91 A 120": [4, 1578192, 57019], "121 A 150": [2, 859571, 67092]}, "afvp": {"1 A 14": [147, 57508796, 3005], "0": [298, 120876161, 0], "15 A 29": [60, 23888871, 104122], "30 A 60": [19, 7701715, 146425], "61 A 90": [1, 477528, 787]}};
+const CMP_SNAP={"lto": {"1 A 14": [553, 153972705, 4352], "0": [1492, 341947724, 0], "30 A 60": [288, 84381245, 249977], "121 A 150": [46, 15022511, 695495], "61 A 90": [223, 67046109, 915676], "15 A 29": [227, 64837529, 37006], "151 A 180": [29, 8969525, 813071], "91 A 120": [67, 19461675, 482731], "181 A 365": [3, 1093455, 63966]}, "afv": {"1 A 14": [277, 108096511, 3005], "0": [460, 184126157, 0], "15 A 29": [134, 53070730, 104230], "30 A 60": [65, 25427732, 177772], "61 A 90": [14, 5634021, 129701], "91 A 120": [4, 1578192, 57019], "121 A 150": [2, 859571, 67092]}, "afvp": {"1 A 14": [147, 57508796, 3005], "0": [298, 120876161, 0], "15 A 29": [60, 23888871, 104122], "30 A 60": [19, 7701715, 146425], "61 A 90": [1, 477528, 787]}, "afn": {"1 A 14": [34, 12563154, 21224], "0": [167, 62239586, 0]}};
 const SNAP_ORDER=[['0','Al corriente','#9ed3cd'],['1 A 14','1-14','#f0b35e'],['15 A 29','15-29','#e58a7f'],
  ['30 A 60','30-60','#e0954d'],['61 A 90','61-90','#c46a6a'],['91 A 120','91-120','#a05252'],
  ['121 A 150','121-150','#8d4444'],['151 A 180','151-180','#7a3a3a'],['181 A 365','181-365','#663030'],
@@ -1480,7 +1524,7 @@ function renderSnap(seg,elId){
   el.querySelectorAll('td').forEach(td=>{td.style.padding='5px 6px';td.style.borderTop='1px solid #f0f3f3';});
 }
 renderSnap('lto','cmpSnapLTO'); renderSnap('afv','cmpSnapAFV');
-document.getElementById('snapTitleL').textContent='Bucket snapshot \u2014 LTO \u00b7 '+CMP_T.cierre;
+document.getElementById('snapTitleL').textContent='Bucket snapshot \u2014 Legacy AF \u00b7 '+CMP_T.cierre;
 document.getElementById('snapTitleA').textContent='Bucket snapshot \u2014 AFV \u00b7 '+CMP_T.cierre;
 
 // ══ AFV+ : cosechas AFV desde el 12-jul-26 (AFVP_K / AFVP_AGE los refresca el script semanal) ══
@@ -1552,6 +1596,78 @@ function setAfvpSev(k,btn){
   if(hasSnap){ renderSnap('afvp','cmpSnapAFVP'); }
   else { const e=document.getElementById('cmpSnapAFVP'); if(e) e.innerHTML='<p style="font-size:11px;color:#8a9a9a;padding:6px 0">Sin contratos AFV+ al corte.</p>'; }
   renderAfvpKpis(); afvpAlert(); renderAfvpAge();
+})();
+// ══ AFN : politicas nuevas (AFN_K / AFN_AGE los refresca el script semanal) ══
+const AFN_K={"cierre": "30-sep-26", "n": 201, "saldo_m": 74.8, "ticket_k": 372.0, "corr": 83.2, "m114": 16.8, "m1529": 0.0, "m3060": 0.0, "m6190": 0.0, "imor": 0.0, "mora": 16.8, "m129": 16.8, "edad": 1.3, "edad_max": 4, "primera": "2026-09-02"};
+const AFN_AGE={"mobs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "afn": {"a1": [0.0, 5.3, 7.7, 48.0, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "a7": [0.0, 1.0, 0.0, 0.0, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "a15": [0.0, 0.0, 0.0, 0.0, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "a30": [0.0, 0.0, 0.0, 0.0, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "cap": [52.6, 34.2, 15.2, 0.8, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, "afvp": {"a1": [0.0, 4.9, 14.5, 18.2, 22.6, 23.3, 28.0, 27.2, 30.2, 39.1, 37.5, null, null, null, null, null, null, null, null, null, null], "a7": [0.0, 0.0, 1.4, 8.8, 11.5, 12.9, 17.1, 16.0, 18.4, 24.3, 18.9, null, null, null, null, null, null, null, null, null, null], "a15": [0.0, 0.0, 0.0, 1.4, 6.1, 7.7, 9.9, 12.4, 14.1, 16.0, 12.4, null, null, null, null, null, null, null, null, null, null], "a30": [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 3.8, 3.2, 5.3, 4.4, 4.4, null, null, null, null, null, null, null, null, null, null], "cap": [140.2, 163.7, 174.0, 180.2, 140.0, 134.5, 110.7, 106.4, 86.5, 43.3, 18.8, null, null, null, null, null, null, null, null, null, null]}, "afvb": {"a1": [5.3, 21.1, 29.5, 33.6, 34.2, 37.8, 38.6, 40.0, 41.5, 44.4, 46.3, 48.2, 45.5, 43.7, 47.6, 44.7, 47.3, 45.4, 37.3, 43.2, 39.1], "a7": [0.7, 1.4, 9.6, 13.4, 17.5, 22.3, 24.7, 27.2, 27.5, 30.1, 31.8, 35.1, 34.0, 29.6, 29.9, 30.8, 41.8, 39.3, 36.2, 43.2, 39.1], "a15": [0.0, 0.0, 0.4, 7.1, 10.2, 12.7, 16.2, 19.8, 21.4, 24.1, 23.2, 24.2, 23.3, 22.7, 20.6, 22.9, 28.8, 29.6, 28.3, 24.6, 19.5], "a30": [0.0, 0.0, 0.0, 0.0, 0.2, 5.0, 7.7, 7.7, 12.3, 12.7, 13.8, 15.2, 12.6, 11.3, 13.1, 14.7, 16.0, 16.1, 18.6, 9.6, 0.0], "cap": [176.8, 203.1, 202.2, 178.5, 163.1, 162.6, 180.7, 159.3, 135.4, 147.6, 145.7, 163.3, 135.6, 114.5, 66.9, 69.2, 59.0, 39.8, 30.0, 7.4, 1.8]}, "af": {"a1": [13.0, 6.7, 26.5, 29.9, 35.1, 44.2, 47.6, 53.4, 54.1, 56.8, 58.7, 60.5, 60.9, 63.6, 64.1, 63.7, 64.8, 64.8, 64.4, 66.4, 65.7], "a7": [1.0, 0.9, 1.3, 12.8, 19.7, 27.3, 28.8, 35.0, 35.7, 39.7, 43.1, 45.5, 48.1, 50.0, 51.1, 51.5, 53.4, 53.9, 53.5, 54.5, 54.2], "a15": [0.0, 0.0, 0.0, 0.5, 10.8, 17.2, 20.2, 24.4, 26.6, 30.2, 31.8, 34.7, 36.9, 40.5, 42.2, 42.6, 43.7, 43.9, 43.5, 44.6, 45.3], "a30": [0.0, 0.0, 0.0, 0.0, 0.0, 2.6, 8.0, 11.8, 15.2, 18.0, 19.4, 22.3, 25.0, 28.4, 29.1, 29.7, 30.3, 31.8, 32.8, 34.0, 35.1], "cap": [45.8, 95.7, 125.9, 149.5, 168.7, 204.8, 226.9, 242.8, 246.2, 263.2, 288.5, 303.3, 317.0, 326.4, 340.0, 350.3, 358.7, 328.4, 323.6, 313.5, 312.5]}};
+let afnSev='a1', chAfnAge=null;
+function renderAfnKpis(){
+  const el=document.getElementById('afnKpis'); if(!el) return;
+  const k=AFN_K;
+  if(!k || !k.n){ el.innerHTML='<div class="kpi-comp"><div class="lbl">AFN</div><div class="val" style="font-size:15px">Sin contratos AFN en este corte</div></div>'; return; }
+  const P=(typeof AFVP_K!=='undefined'&&AFVP_K&&AFVP_K.n)?AFVP_K:null;
+  const lg=k2=>{const a=(CMP_T.lto||{})[k2]||[];return a.length?a[a.length-1]:null;};
+  const better=(a,b)=>a<b?'var(--green)':(a>b?'var(--red)':'var(--text2)');
+  const f1=v=>(v===null||v===undefined)?'—':(+v).toFixed(1)+'%';
+  const legCorr=lg('corr'), legM129=(lg('m114')||0)+(lg('m1529')||0), legImor=(lg('m3060')||0)+(lg('m6190')||0)+(lg('m91p')||0);
+  el.innerHTML=
+    afvpCard('Contratos AFN',k.n.toLocaleString(),[['Saldo','$'+k.saldo_m.toFixed(1)+'M'],['Ticket','$'+Math.round(k.ticket_k)+'k'],['1a originación',k.primera||'—']])+
+    afvpCard('Edad promedio',k.edad+' sem',[['Máxima',k.edad_max+' sem'],P?['AFV+',P.edad+' sem']:null])+
+    afvpCard('Al corriente',k.corr.toFixed(1)+'%',[P?['AFV+',f1(P.corr),better(P.corr,k.corr)]:null,['Legacy AF',f1(legCorr),better(legCorr,k.corr)]])+
+    afvpCard('Mora 1-29 d',k.m129.toFixed(1)+'%',[P?['AFV+',f1(P.m129),better(k.m129,P.m129)]:null,['Legacy AF',f1(legM129),better(k.m129,legM129)]])+
+    afvpCard('IMOR 30+ d',k.imor.toFixed(1)+'%',[P?['AFV+',f1(P.imor),better(k.imor,P.imor)]:null,['Legacy AF',f1(legImor),better(k.imor,legImor)]]);
+  const t=document.getElementById('snapTitleN');
+  if(t) t.textContent='Bucket snapshot — AFN · '+(k.cierre||CMP_T.cierre);
+}
+function afnAlert(){
+  const box=document.getElementById('afnAlert'); if(!box) return;
+  const A=AFN_AGE; if(!A.mobs||!A.mobs.length||!A.afn){box.style.display='none';return;}
+  const ok=v=>v!==null&&v!==undefined;
+  let mob=-1;
+  for(let i=A.mobs.length-1;i>=0;i--){ if(ok(A.afn[afnSev][i])&&(A.afn.cap[i]||0)>=5&&ok((A.afvp||{})[afnSev]?A.afvp[afnSev][i]:null)){mob=i;break;} }
+  if(mob<0){box.style.display='none';return;}
+  const n=A.afn[afnSev][mob], p=A.afvp[afnSev][mob], b=(A.afvb&&ok(A.afvb[afnSev][mob]))?A.afvb[afnSev][mob]:null, w=A.mobs[mob];
+  const nobs=A.afn[afnSev].filter(ok).length;
+  const mejor=n<p;
+  box.style.display=''; box.className='alert';
+  box.style.background=mejor?'var(--green-light)':'var(--red-light)';
+  box.style.borderColor=mejor?'var(--green)':'var(--red)';
+  box.style.color=mejor?'#14532d':'#7b1d1d';
+  box.innerHTML='<strong>Lectura a la misma edad:</strong> a '+w+' semana'+(w===1?'':'s')+' en libros, AFN trae <strong>'+n.toFixed(1)+'%</strong> del capital con atraso '+AFVP_SEV[afnSev]+
+    ' vs <strong>'+p.toFixed(1)+'%</strong> de AFV+'+(b!==null?' y '+b.toFixed(1)+'% del AFV previo':'')+' a esa misma edad'+
+    (A.afn.cap[mob]?' · base AFN observada: $'+A.afn.cap[mob].toFixed(1)+'M':'')+'. Muestra corta ('+nobs+' edad'+(nobs===1?'':'es')+' observada'+(nobs===1?'':'s')+'): confirmar con más cortes.';
+}
+function renderAfnAge(){
+  const cv=document.getElementById('chartAfnAge'); if(!cv) return;
+  const A=AFN_AGE; if(chAfnAge) chAfnAge.destroy();
+  const mobs=(A.mobs||[]);
+  const ds=(g,lbl,col,extra)=>Object.assign({label:lbl,data:(A[g]||{})[afnSev]||[],borderColor:col,backgroundColor:col,borderWidth:2,pointRadius:2,tension:.3,fill:false,_g:g},extra||{});
+  chAfnAge=new Chart(cv,{type:'line',
+   data:{labels:mobs.map(m=>'s'+m),datasets:[
+    ds('af','AF legacy (cosechas 2026)','#c3ccd6',{borderDash:[6,4],pointRadius:0}),
+    ds('afvb','AFV previo (< 12-jul)','#8a9a9a'),
+    ds('afvp','AFV+ (≥ 12-jul)','#11ABAB',{borderWidth:2.4,borderDash:[5,3],pointRadius:3.5,pointStyle:'triangle'}),
+    ds('afn','AFN (políticas nuevas)','#5b3f9a',{borderWidth:3.2,pointRadius:4.5,pointStyle:'rectRot'})]},
+   options:{maintainAspectRatio:false,animation:false,spanGaps:false,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}},
+     title:{display:true,text:'Capital con atraso '+AFVP_SEV[afnSev]+' · % del capital de la cosecha',font:{size:10,weight:'500'},color:'#8a9a9a'},
+     tooltip:{callbacks:{title:c=>'Semana '+mobs[c[0].dataIndex]+' en libros',
+       label:c=>{const cap=((A[c.dataset._g])||{}).cap||[];
+         return ' '+c.dataset.label+': '+(c.parsed.y===null?'—':c.parsed.y.toFixed(1)+'%')+(cap[c.dataIndex]?'  (base $'+cap[c.dataIndex].toFixed(1)+'M)':'');}}}},
+    scales:{x:{title:{display:true,text:'semanas en libros',font:{size:9},color:'#8a9a9a'},grid:{display:false},ticks:{font:{size:9}}},
+            y:{min:0,ticks:{callback:v=>v+'%',font:{size:9}}}}}});
+}
+function setAfnSev(k,btn){
+  afnSev=k;
+  btn.parentElement.querySelectorAll('.ma-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAfnAge(); afnAlert();
+}
+(function(){
+  const hasSnap=CMP_SNAP && CMP_SNAP.afn && Object.keys(CMP_SNAP.afn).length;
+  if(hasSnap){ renderSnap('afn','cmpSnapAFN'); }
+  else { const e=document.getElementById('cmpSnapAFN'); if(e) e.innerHTML='<p style="font-size:11px;color:#8a9a9a;padding:6px 0">Sin contratos AFN al corte.</p>'; }
+  renderAfnKpis(); afnAlert(); renderAfnAge();
 })();
 function setCmpBk(k,btn){
   cmpBk=k;
